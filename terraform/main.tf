@@ -13,6 +13,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
   }
 }
 
@@ -34,6 +38,23 @@ data "aws_ami" "amazon_linux" {
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
+  }
+}
+
+# ---------- TLS Private Key ----------
+resource "tls_private_key" "ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# ---------- AWS Key Pair ----------
+resource "aws_key_pair" "deployer" {
+  key_name   = var.key_name
+  public_key = tls_private_key.ssh_key.public_key_openssh
+
+  tags = {
+    Name    = var.key_name
+    Project = "my-devops-project"
   }
 }
 
@@ -107,7 +128,7 @@ resource "aws_instance" "health_dashboard" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.health_dashboard_sg.id]
-  key_name               = var.key_name
+  key_name               = aws_key_pair.deployer.key_name
 
   # User data script to install Docker and Docker Compose
   user_data = <<-EOF
@@ -127,7 +148,7 @@ resource "aws_instance" "health_dashboard" {
   EOF
 
   root_block_device {
-    volume_size = 20
+    volume_size = 30
     volume_type = "gp3"
   }
 

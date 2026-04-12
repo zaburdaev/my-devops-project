@@ -50,3 +50,8 @@ Thumbs.db
 # --- OS ---
 *.bak
 *.tmp
+
+# SSH Keys
+my-devops-key.pem
+*.pem
+server_ip.txt

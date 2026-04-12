@@ -32,3 +32,14 @@ output "prometheus_url" {
   description = "URL to access Prometheus"
   value       = "http://${aws_instance.health_dashboard.public_ip}:9090"
 }
+
+output "ssh_private_key" {
+  description = "Private SSH key for EC2 access"
+  value       = tls_private_key.ssh_key.private_key_pem
+  sensitive   = true
+}
+
+output "ssh_command" {
+  description = "SSH command to connect to the server"
+  value       = "ssh -i my-devops-key.pem ec2-user@${aws_instance.health_dashboard.public_ip}"
+}
