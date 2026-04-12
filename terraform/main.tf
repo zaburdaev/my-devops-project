@@ -136,13 +136,20 @@ resource "aws_instance" "health_dashboard" {
     set -e
     # Update system
     yum update -y
-    # Install Docker
-    yum install -y docker
+    # Install Docker and Git
+    yum install -y docker git
     systemctl start docker
     systemctl enable docker
-    # Install Docker Compose
-    curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    # Install Docker Compose (as CLI plugin and standalone)
+    mkdir -p /usr/local/lib/docker/cli-plugins/
+    curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/lib/docker/cli-plugins/docker-compose
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+    cp /usr/local/lib/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
+    # Install Docker Buildx
+    BUILDX_VERSION="v0.21.1"
+    curl -SL "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-amd64" -o /usr/local/lib/docker/cli-plugins/docker-buildx
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
     # Add ec2-user to docker group
     usermod -aG docker ec2-user
   EOF

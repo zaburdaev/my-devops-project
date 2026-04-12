@@ -18,6 +18,103 @@
 
 ## 1. 🔄 Ошибки CI/CD Pipeline
 
+### ❌ Ошибка: "git: command not found"
+
+**Описание:** На сервере не установлен Git, и CI/CD не может клонировать репозиторий.
+
+**Лог ошибки:**
+```
+📦 First deployment — cloning repository...
+sudo: git: command not found
+```
+
+**Причина:** Git не был включён в user_data скрипт Terraform при создании EC2 инстанса.
+
+**Решение:**
+```bash
+# Подключитесь к серверу
+ssh -i my-devops-key.pem ec2-user@54.93.95.178
+
+# Установите git
+sudo dnf install -y git    # Amazon Linux 2023
+# или
+sudo yum install -y git    # Amazon Linux 2
+
+# Проверьте установку
+git --version
+```
+
+**Профилактика:** В Terraform `user_data` и Ansible playbook уже добавлена установка git.
+
+---
+
+### ❌ Ошибка: "cp: cannot stat '.env.example': No such file or directory"
+
+**Описание:** Файл `.env.example` не найден, потому что репозиторий не был клонирован (из-за отсутствия git).
+
+**Решение:** Установите git и клонируйте репозиторий (см. ошибку выше), затем:
+```bash
+cd /opt/health-dashboard
+cp .env.example .env
+```
+
+---
+
+### ❌ Ошибка: "no configuration file provided: not found" / "Failed to pull images"
+
+**Описание:** Docker Compose не находит `docker-compose.yml`, потому что репозиторий не был клонирован.
+
+**Решение:** Клонируйте репозиторий и запустите сервисы:
+```bash
+cd /opt
+sudo git clone https://github.com/zaburdaev/my-devops-project.git /opt/health-dashboard
+sudo chown -R ec2-user:ec2-user /opt/health-dashboard
+cd /opt/health-dashboard
+cp .env.example .env
+docker compose up -d --build
+```
+
+---
+
+### ❌ Ошибка: "compose build requires buildx 0.17.0 or later"
+
+**Описание:** Docker Buildx не установлен или устаревшая версия.
+
+**Решение:**
+```bash
+# Установите Docker Buildx
+sudo mkdir -p /usr/local/lib/docker/cli-plugins/
+sudo curl -SL "https://github.com/docker/buildx/releases/download/v0.21.1/buildx-v0.21.1.linux-amd64" -o /usr/local/lib/docker/cli-plugins/docker-buildx
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
+
+# Проверьте
+docker buildx version
+```
+
+---
+
+### ❌ Ошибка: "docker: 'compose' is not a docker command"
+
+**Описание:** Docker Compose не установлен как плагин Docker CLI.
+
+**Решение:**
+```bash
+# Установите Docker Compose как плагин
+sudo mkdir -p /usr/local/lib/docker/cli-plugins/
+sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/lib/docker/cli-plugins/docker-compose
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+# Также установите standalone версию
+sudo cp /usr/local/lib/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+# Проверьте
+docker compose version
+docker-compose --version
+```
+
+---
+
 ### ❌ Ошибка: "Directory not found" (cd: /opt/health-dashboard: No such file or directory)
 
 **Описание:** GitHub Actions при деплое пытается перейти в директорию `/opt/health-dashboard`, но она ещё не создана на сервере.

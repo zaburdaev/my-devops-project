@@ -25,6 +25,13 @@
         state: latest
       tags: system
 
+    # --- Install Git ---
+    - name: Install git
+      yum:
+        name: git
+        state: present
+      tags: system
+
     # --- Firewall Configuration ---
     - name: Install firewalld
       yum:

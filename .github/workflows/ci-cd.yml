@@ -117,14 +117,37 @@ jobs:
           script: |
             echo "🚀 Starting deployment..."
 
+            # Install git if not present
+            if ! command -v git &> /dev/null; then
+              echo "📦 Installing git..."
+              sudo dnf install -y git || sudo yum install -y git
+            fi
+
+            # Install Docker Buildx if not present
+            if ! docker buildx version &> /dev/null; then
+              echo "📦 Installing Docker Buildx..."
+              sudo mkdir -p /usr/local/lib/docker/cli-plugins/
+              sudo curl -SL "https://github.com/docker/buildx/releases/download/v0.21.1/buildx-v0.21.1.linux-amd64" -o /usr/local/lib/docker/cli-plugins/docker-buildx
+              sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
+            fi
+
+            # Install Docker Compose plugin if not present
+            if ! docker compose version &> /dev/null; then
+              echo "📦 Installing Docker Compose plugin..."
+              sudo mkdir -p /usr/local/lib/docker/cli-plugins/
+              sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/lib/docker/cli-plugins/docker-compose
+              sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+            fi
+
             # Create directory if it doesn't exist
             sudo mkdir -p /opt/health-dashboard
 
             # Check if it's first deploy (no .git directory)
             if [ ! -d "/opt/health-dashboard/.git" ]; then
-              echo "📦 First deployment - cloning repository..."
+              echo "📦 First deployment — cloning repository..."
               cd /opt
-              sudo git clone https://github.com/${{ github.repository }}.git health-dashboard
+              sudo rm -rf /opt/health-dashboard
+              sudo git clone https://github.com/${{ github.repository }}.git /opt/health-dashboard
               sudo chown -R $(whoami):$(whoami) /opt/health-dashboard
             else
               echo "🔄 Updating existing deployment..."
@@ -138,20 +161,29 @@ jobs:
             # Create .env file if it doesn't exist
             if [ ! -f ".env" ]; then
               echo "📝 Creating .env from .env.example..."
-              cp .env.example .env
+              if [ -f ".env.example" ]; then
+                cp .env.example .env
+              else
+                echo "⚠️ .env.example not found, creating minimal .env"
+                echo "FLASK_DEBUG=0" > .env
+                echo "SECRET_KEY=change-me-in-production" >> .env
+                echo "POSTGRES_HOST=postgres" >> .env
+                echo "POSTGRES_PORT=5432" >> .env
+                echo "POSTGRES_DB=health_dashboard" >> .env
+                echo "POSTGRES_USER=postgres" >> .env
+                echo "POSTGRES_PASSWORD=changeme" >> .env
+                echo "REDIS_HOST=redis" >> .env
+                echo "REDIS_PORT=6379" >> .env
+              fi
             fi
 
-            # Pull latest Docker images
-            echo "🐳 Pulling Docker images..."
-            docker-compose pull || { echo "❌ Failed to pull images"; exit 1; }
-
-            # Restart services
-            echo "🔄 Restarting services..."
-            docker-compose up -d || { echo "❌ Failed to start containers"; exit 1; }
+            # Build and start services
+            echo "🐳 Building and starting services..."
+            docker compose up -d --build || { echo "❌ Failed to start containers"; exit 1; }
 
             # Show status
             echo "📊 Service status:"
-            docker-compose ps
+            docker compose ps
 
             echo "✅ Deployment complete!"
 
