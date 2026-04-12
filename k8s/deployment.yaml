@@ -1,0 +1,47 @@
+# Deployment for Health Dashboard Flask application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: health-dashboard
+  namespace: health-dashboard
+  labels:
+    app: health-dashboard
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: health-dashboard
+  template:
+    metadata:
+      labels:
+        app: health-dashboard
+    spec:
+      containers:
+        - name: health-dashboard
+          image: oskalibriya/health-dashboard:latest
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: health-dashboard-config
+            - secretRef:
+                name: health-dashboard-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10

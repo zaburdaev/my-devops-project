@@ -1,0 +1,52 @@
+# =============================================================================
+# .gitignore for Health Dashboard (my-devops-project)
+# Python, Docker, Terraform, IDE, OS files
+# =============================================================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+venv/
+env/
+.venv/
+*.whl
+.pytest_cache/
+htmlcov/
+.coverage
+.tox/
+
+# --- Environment ---
+.env
+!.env.example
+
+# --- Docker ---
+*.log
+docker-compose.override.yml
+
+# --- Terraform ---
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform.lock.hcl
+crash.log
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- OS ---
+*.bak
+*.tmp

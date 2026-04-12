@@ -1,0 +1,9 @@
+# Helm Chart for Health Dashboard
+apiVersion: v2
+name: health-dashboard
+description: A Helm chart for deploying the Health Dashboard Flask application
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: Vitalii Zaburdaiev

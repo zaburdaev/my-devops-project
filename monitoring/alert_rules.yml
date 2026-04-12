@@ -1,0 +1,37 @@
+# =============================================================================
+# Prometheus Alerting Rules (Optional)
+# Author: Vitalii Zaburdaiev | DevOpsUA6
+# =============================================================================
+
+groups:
+  - name: health-dashboard-alerts
+    rules:
+      # Alert when CPU usage is above 80% for 5 minutes
+      - alert: HighCpuUsage
+        expr: system_cpu_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 5 minutes."
+
+      # Alert when memory usage is above 85%
+      - alert: HighMemoryUsage
+        expr: system_memory_usage_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for more than 5 minutes."
+
+      # Alert when the app is down
+      - alert: AppDown
+        expr: up{job="health-dashboard"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Health Dashboard is down"
+          description: "The Health Dashboard application has been down for more than 1 minute."

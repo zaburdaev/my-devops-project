@@ -1,0 +1,16 @@
+# ConfigMap for Health Dashboard application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: health-dashboard-config
+  namespace: health-dashboard
+  labels:
+    app: health-dashboard
+data:
+  APP_PORT: "5000"
+  FLASK_DEBUG: "false"
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "healthdb"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"

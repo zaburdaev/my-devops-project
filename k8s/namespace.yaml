@@ -1,0 +1,8 @@
+# Kubernetes Namespace for Health Dashboard
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: health-dashboard
+  labels:
+    app: health-dashboard
+    project: my-devops-project

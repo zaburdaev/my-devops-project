@@ -1,0 +1,37 @@
+# Default values for Health Dashboard Helm chart
+
+replicaCount: 2
+
+image:
+  repository: oskalibriya/health-dashboard
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 5000
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "250m"
+
+config:
+  appPort: "5000"
+  flaskDebug: "false"
+  postgresHost: "postgres-service"
+  postgresPort: "5432"
+  postgresDb: "healthdb"
+  redisHost: "redis-service"
+  redisPort: "6379"
+
+secrets:
+  postgresUser: "admin"
+  postgresPassword: "changeme"
+  secretKey: "my-secret-key"
+
+namespace: health-dashboard

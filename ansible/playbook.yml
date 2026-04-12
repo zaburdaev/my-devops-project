@@ -1,0 +1,55 @@
+---
+# =============================================================================
+# Ansible Playbook for Health Dashboard
+# Author: Vitalii Zaburdaiev | DevOpsUA6
+# Installs Docker, Docker Compose, configures firewall, and deploys the app
+# =============================================================================
+
+- name: Deploy Health Dashboard
+  hosts: webservers
+  become: yes
+
+  vars:
+    app_dir: /opt/health-dashboard
+    docker_compose_version: "2.24.0"
+
+  roles:
+    - docker
+    - app
+
+  tasks:
+    # --- System Update ---
+    - name: Update system packages
+      yum:
+        name: "*"
+        state: latest
+      tags: system
+
+    # --- Firewall Configuration ---
+    - name: Install firewalld
+      yum:
+        name: firewalld
+        state: present
+      tags: firewall
+
+    - name: Start and enable firewalld
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+      tags: firewall
+
+    - name: Open required ports in firewall
+      firewalld:
+        port: "{{ item }}"
+        permanent: yes
+        state: enabled
+        immediate: yes
+      loop:
+        - 80/tcp      # HTTP (Nginx)
+        - 443/tcp     # HTTPS
+        - 22/tcp      # SSH
+        - 3000/tcp    # Grafana
+        - 9090/tcp    # Prometheus
+        - 5000/tcp    # Flask app
+      tags: firewall
