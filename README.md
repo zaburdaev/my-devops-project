@@ -10,7 +10,10 @@
 > **Author:** Vitalii Zaburdaiev  
 > **Course:** DevOpsUA6  
 > **Docker Hub:** [oskalibriya/health-dashboard](https://hub.docker.com/r/oskalibriya/health-dashboard)  
+> **AWS:** Deployed at `54.93.95.178` ✅  
 > **Description:** A full-stack DevOps project featuring a system health monitoring dashboard built with Flask, containerized with Docker, orchestrated with Kubernetes, provisioned with Terraform, configured with Ansible, and monitored with Prometheus + Grafana + Loki.
+
+🇷🇺 [Версия на русском](./README_RU.md)
 
 ---
 
@@ -257,6 +260,31 @@ This project includes comprehensive documentation for every aspect:
 | 🧪 [Testing](./docs/TESTING.md) | Testing strategy & how to run tests |
 | ✅ [Project Checklist](./docs/PROJECT_CHECKLIST.md) | Submission checklist (240 points) |
 | 🤝 [Contributing](./CONTRIBUTING.md) | How to contribute to this project |
+
+### 🇷🇺 Russian Documentation
+
+| Document | Description |
+|----------|-------------|
+| 📘 [Руководство для начинающих](./docs/BEGINNER_GUIDE_RU.md) | Complete beginner guide (Russian) |
+| 🎬 [Сценарий демонстрации](./docs/DEMO_SCRIPT_RU.md) | Demo script for project defense (Russian) |
+| ☁️ [AWS деплой](./docs/AWS_DEPLOYMENT_RU.md) | AWS deployment guide (Russian) |
+| 🚀 [Deployment Summary](./DEPLOYMENT_SUMMARY.md) | Deployed infrastructure summary |
+| 🔒 [Security Audit](./SECURITY_AUDIT.md) | Security audit results |
+| 📋 [Documentation Status](./DOCUMENTATION_STATUS.md) | Full documentation status report |
+
+---
+
+## 🌐 Live Deployment
+
+The application is **deployed and running** on AWS:
+
+| Service | URL |
+|---------|-----|
+| **Health Dashboard** | http://54.93.95.178 |
+| **Grafana** | http://54.93.95.178:3000 |
+| **Prometheus** | http://54.93.95.178:9090 |
+
+> 📖 See [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md) and [docs/AWS_DEPLOYMENT_RU.md](./docs/AWS_DEPLOYMENT_RU.md) for details.
 
 ---
 
