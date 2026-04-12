@@ -387,17 +387,23 @@ docker-compose ps
 curl localhost:5000/health
 ```
 
-### Вариант 3: Через CI/CD (GitHub Actions)
+### Вариант 3: Через CI/CD (GitHub Actions) — автоматический деплой
 
 При пуше в `main` ветку, GitHub Actions автоматически:
 1. Запускает тесты
 2. Собирает Docker образ
 3. Деплоит на сервер по SSH
 
-Для этого нужно настроить GitHub Secrets:
+> 💡 **Первый деплой выполняется автоматически!** Workflow сам создаст директорию `/opt/health-dashboard`, склонирует репозиторий, создаст `.env` файл и запустит приложение. Не нужно предварительно настраивать сервер вручную (если Docker и Docker Compose уже установлены).
+
+> 💡 **Совет:** Рекомендуется сначала запустить Ansible playbook (`ansible-playbook -i inventory.ini playbook.yml`), который установит Docker и Docker Compose, а затем CI/CD будет автоматически деплоить обновления.
+
+Для работы CI/CD нужно настроить GitHub Secrets:
 - `SERVER_HOST` — IP адрес сервера
 - `SERVER_USER` — `ec2-user`
 - `SSH_PRIVATE_KEY` — содержимое файла `my-devops-key.pem`
+
+Подробнее об ошибках CI/CD и их решениях: [Руководство по устранению неполадок](./TROUBLESHOOTING_RU.md)
 
 ---
 

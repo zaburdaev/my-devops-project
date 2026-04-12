@@ -126,15 +126,26 @@ steps:
 
 ```yaml
 steps:
-  1. Connects to the server via SSH
-  2. Navigates to the application directory
-  3. Pulls the latest Docker image
-  4. Restarts Docker Compose services
+  1. Checks if deployment secrets are configured (skips gracefully if not)
+  2. Connects to the server via SSH
+  3. Creates /opt/health-dashboard directory if it doesn't exist
+  4. On first deploy: clones the repository from GitHub
+  5. On subsequent deploys: pulls the latest changes via git pull
+  6. Creates .env file from .env.example if it doesn't exist
+  7. Pulls the latest Docker images
+  8. Restarts Docker Compose services
+  9. Shows service status
 ```
 
-**Why this matters:** Automatically deploys new code to the server without manual intervention.
+**Why this matters:** Automatically deploys new code to the server without manual intervention. The deployment script handles both initial (first-time) and subsequent deployments automatically — no need to manually set up the server directory beforehand.
 
-> ⚠️ **Note:** The Deploy stage requires a running server and configured SSH access. Without these, it will fail — this is expected if you haven't set up a cloud server yet.
+> ⚠️ **Note:** The Deploy stage requires a running server and configured SSH access. Without these, the step is gracefully skipped — this is expected for development/educational setups.
+>
+> 💡 **Tip:** Alternatively, you can run the Ansible playbook first to prepare the server:
+> ```bash
+> cd ansible
+> ansible-playbook -i inventory.ini playbook.yml
+> ```
 
 ---
 
@@ -185,19 +196,28 @@ jobs:
             oskalibriya/health-dashboard:latest
             oskalibriya/health-dashboard:${{ github.sha }}
 
-  # JOB 3: Deploy to server
+  # JOB 3: Deploy to server (handles first deploy automatically)
   deploy:
     needs: build              # Only run if build passes
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: appleboy/ssh-action@v0.1.7  # SSH into server
+      - name: Check deployment secrets    # Skip if not configured
+      - uses: appleboy/ssh-action@v1      # SSH into server
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            sudo mkdir -p /opt/health-dashboard
+            if [ ! -d "/opt/health-dashboard/.git" ]; then
+              cd /opt && sudo git clone <repo-url> health-dashboard
+              sudo chown -R $(whoami):$(whoami) /opt/health-dashboard
+            else
+              cd /opt/health-dashboard && git pull origin main
+            fi
             cd /opt/health-dashboard
+            [ ! -f ".env" ] && cp .env.example .env
             docker-compose pull
             docker-compose up -d
 ```
@@ -355,15 +375,29 @@ pip freeze > requirements_check.txt
 
 ### ❌ Deploy Fails with "No Such Directory"
 
-**Problem:** The application directory doesn't exist on the server.
+**Problem:** The application directory `/opt/health-dashboard` doesn't exist on the server (common on first deployment).
 
-**Solution:** SSH into the server and set up the application first:
+**This issue has been fixed!** The deployment script now automatically:
+1. Creates the directory if it doesn't exist (`sudo mkdir -p /opt/health-dashboard`)
+2. Clones the repository on first deploy
+3. Pulls updates on subsequent deploys
+
+**If you still encounter this issue**, SSH into the server and set up manually:
 ```bash
 ssh -i key.pem ec2-user@your-server-ip
-git clone https://github.com/zaburdaev/my-devops-project.git /opt/health-dashboard
+sudo mkdir -p /opt/health-dashboard
+cd /opt
+sudo git clone https://github.com/zaburdaev/my-devops-project.git health-dashboard
+sudo chown -R ec2-user:ec2-user /opt/health-dashboard
 cd /opt/health-dashboard
 cp .env.example .env
 docker-compose up -d --build
+```
+
+**Alternative:** Run Ansible playbook first to prepare the server:
+```bash
+cd ansible
+ansible-playbook -i inventory.ini playbook.yml
 ```
 
 ---
