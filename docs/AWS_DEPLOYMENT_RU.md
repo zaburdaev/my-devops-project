@@ -659,3 +659,42 @@ ssh -i key.pem user@ip "command"         # Выполнение команды
 ---
 
 > 💡 **Совет:** Всегда удаляйте ресурсы после использования командой `terraform destroy`, чтобы не платить за неиспользуемые серверы!
+
+
+
+---
+
+## 9. ♻️ Переразвёртывание после удаления EC2 (Recovery Runbook)
+
+Если сервер был удалён (ошибка в CI/CD: `dial tcp <old_ip>:22: i/o timeout`), выполните:
+
+```bash
+cd /home/ubuntu/my-devops-project/terraform
+
+# 1) Очистка старого состояния
+terraform state list
+terraform destroy -auto-approve || true
+
+# 2) Повторный деплой инфраструктуры
+terraform init
+terraform plan
+terraform apply -auto-approve
+
+# 3) Сохранение ключа и IP
+terraform output -raw ssh_private_key > my-devops-key.pem
+chmod 600 my-devops-key.pem
+terraform output -raw instance_public_ip
+```
+
+Далее обновите GitHub Secrets:
+- `SERVER_HOST` = новый IP
+- `SERVER_USER` = `ec2-user`
+- `SSH_PRIVATE_KEY` = содержимое `my-devops-key.pem`
+
+После этого:
+1. Запустите `ansible-playbook -i inventory.ini playbook.yml` для первичного развёртывания.
+2. Выполните push в `main`, чтобы проверить автоматический деплой через GitHub Actions.
+3. Проверьте доступность:
+   - `http://<IP>/health`
+   - `http://<IP>:3000`
+   - `http://<IP>:9090`
