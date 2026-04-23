@@ -1,114 +1,116 @@
 {
-  "annotations": { "list": [] },
-  "editable": true,
-  "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
   "id": null,
-  "links": [],
-  "liveNow": false,
+  "uid": "health-dashboard-simple",
+  "title": "Health Dashboard - Simple",
+  "tags": ["health-dashboard", "simple"],
+  "timezone": "browser",
+  "schemaVersion": 27,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "panels": [
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": {
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 60 },
-              { "color": "red", "value": 80 }
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
       "id": 1,
-      "options": { "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "title": "CPU Usage",
-      "type": "gauge",
+      "type": "stat",
+      "title": "App Status (up)",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
       "targets": [
-        { "expr": "system_cpu_usage_percent", "legendFormat": "CPU %" }
-      ]
+        {
+          "expr": "up{job=\"flask-app\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value"
+      }
     },
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": {
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 70 },
-              { "color": "red", "value": 85 }
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
       "id": 2,
-      "options": { "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "title": "Memory Usage",
-      "type": "gauge",
+      "type": "stat",
+      "title": "CPU Usage %",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
       "targets": [
-        { "expr": "system_memory_usage_percent", "legendFormat": "Memory %" }
-      ]
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": {
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 75 },
-              { "color": "red", "value": 90 }
-            ]
-          },
-          "unit": "percent"
+        {
+          "expr": "system_cpu_usage_percent",
+          "refId": "A"
         }
-      },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value"
+      }
+    },
+    {
       "id": 3,
-      "options": { "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"] } },
-      "title": "Disk Usage",
-      "type": "gauge",
+      "type": "stat",
+      "title": "Memory Usage %",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 0 },
       "targets": [
-        { "expr": "system_disk_usage_percent", "legendFormat": "Disk %" }
-      ]
+        {
+          "expr": "system_memory_usage_percent",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "value"
+      }
     },
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": { "defaults": { "unit": "reqps" } },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
       "id": 4,
-      "title": "Request Rate",
-      "type": "timeseries",
+      "type": "graph",
+      "title": "CPU Trend",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
       "targets": [
-        { "expr": "rate(app_request_total[5m])", "legendFormat": "{{ method }} {{ endpoint }}" }
-      ]
+        {
+          "expr": "system_cpu_usage_percent",
+          "legendFormat": "CPU %",
+          "refId": "A"
+        }
+      ],
+      "lines": true,
+      "linewidth": 2,
+      "fill": 1
     },
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": { "defaults": { "unit": "s" } },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
       "id": 5,
-      "title": "Request Latency (p95)",
-      "type": "timeseries",
+      "type": "graph",
+      "title": "Memory Trend",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
       "targets": [
-        { "expr": "histogram_quantile(0.95, rate(app_request_latency_seconds_bucket[5m]))", "legendFormat": "p95 {{ endpoint }}" }
-      ]
+        {
+          "expr": "system_memory_usage_percent",
+          "legendFormat": "Memory %",
+          "refId": "A"
+        }
+      ],
+      "lines": true,
+      "linewidth": 2,
+      "fill": 1
     }
-  ],
-  "refresh": "10s",
-  "schemaVersion": 38,
-  "style": "dark",
-  "tags": ["health-dashboard"],
-  "templating": { "list": [] },
-  "time": { "from": "now-1h", "to": "now" },
-  "title": "Health Dashboard",
-  "uid": "health-dashboard",
-  "version": 1
+  ]
 }
