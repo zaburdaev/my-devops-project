@@ -81,6 +81,15 @@ resource "aws_security_group" "health_dashboard_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # App direct access
+  ingress {
+    description = "App"
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # HTTPS access
   ingress {
     description = "HTTPS"
@@ -148,7 +157,7 @@ resource "aws_instance" "health_dashboard" {
     chmod +x /usr/local/bin/docker-compose
     # Install Docker Buildx
     BUILDX_VERSION="v0.21.1"
-    curl -SL "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-amd64" -o /usr/local/lib/docker/cli-plugins/docker-buildx
+    curl -SL "https://github.com/docker/buildx/releases/download/$${BUILDX_VERSION}/buildx-$${BUILDX_VERSION}.linux-amd64" -o /usr/local/lib/docker/cli-plugins/docker-buildx
     chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
     # Add ec2-user to docker group
     usermod -aG docker ec2-user

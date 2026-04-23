@@ -440,3 +440,38 @@ docker-compose restart app
 <p align="center">
   Made with ❤️ by <strong>Vitalii Zaburdaiev</strong> | DevOpsUA6
 </p>
+
+
+
+---
+
+## ⚙️ Grafana Auto-Configuration After Redeploy
+
+After EC2 recreation, you can configure Grafana data sources and import dashboard automatically:
+
+```bash
+cd /home/ubuntu/my-devops-project
+./scripts/configure_grafana.sh <SERVER_IP> admin admin
+```
+
+This script:
+1. Waits for Grafana API to be ready
+2. Adds **Prometheus** datasource (`http://prometheus:9090`)
+3. Adds **Loki** datasource (`http://loki:3100`)
+4. Imports dashboard from `grafana/dashboard.json`
+
+### Dashboard file for recovery scenarios
+
+- Path: `grafana/dashboard.json`
+- Includes panels for:
+  - CPU usage
+  - Memory usage
+  - Request rate
+  - Response time (p95)
+  - Container health status (`up{job="health-dashboard"}`)
+
+If Grafana shows **No data**, generate load and wait 30-60 seconds:
+
+```bash
+for i in {1..30}; do curl -s http://<SERVER_IP>/health >/dev/null; sleep 1; done
+```

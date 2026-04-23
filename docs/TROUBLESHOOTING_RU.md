@@ -389,3 +389,42 @@ curl -v http://localhost:5000/health
 <p align="center">
   Made with ❤️ by <strong>Vitalii Zaburdaiev</strong> | DevOpsUA6
 </p>
+
+
+
+---
+
+## 7. 🆘 Сервер удалён — как восстановить деплой
+
+### Симптомы
+
+- GitHub Actions падает на шаге Deploy по SSH
+- Ошибка: `dial tcp <old_ip>:22: i/o timeout`
+- В Terraform state есть инстанс, но в AWS он уже удалён/terminated
+
+### Пошаговое восстановление
+
+```bash
+# 1) Пересоздать инфраструктуру
+cd /home/ubuntu/my-devops-project/terraform
+terraform destroy -auto-approve || true
+terraform init
+terraform apply -auto-approve
+
+# 2) Получить новый IP и ключ
+terraform output -raw instance_public_ip
+terraform output -raw ssh_private_key > my-devops-key.pem
+chmod 600 my-devops-key.pem
+
+# 3) Первичный деплой приложения
+cd /home/ubuntu/my-devops-project/ansible
+ansible-playbook -i inventory.ini playbook.yml
+```
+
+### Что обязательно обновить в GitHub Secrets
+
+- `SERVER_HOST` → новый IP
+- `SERVER_USER` → `ec2-user`
+- `SSH_PRIVATE_KEY` → новый приватный ключ
+
+После обновления секретов сделайте push в `main`, чтобы заново проверить CI/CD деплой.

@@ -1,21 +1,21 @@
 # 🚀 Deployment Summary — Health Dashboard
 
-> **Deployed:** 2026-04-12  
+> **Redeployed:** 2026-04-23  
 > **Author:** Vitalii Zaburdaiev | DevOpsUA6
 
 ---
 
-## ✅ Deployed Infrastructure
+## ✅ New AWS Infrastructure
 
 | Resource | Details |
 |----------|---------|
 | **EC2 Instance** | t3.micro (Free Tier) |
-| **Instance ID** | i-003f45cb781d8f182 |
-| **Server IP** | 54.93.95.178 |
+| **Instance ID** | i-0c4b446783b0704eb |
+| **Server IP** | 35.158.171.183 |
 | **Region** | eu-central-1 (Frankfurt) |
 | **OS** | Amazon Linux 2023 |
 | **Disk** | 30 GB gp3 SSD |
-| **Security Group** | health-dashboard-sg |
+| **Security Group** | health-dashboard-sg (22, 80, 443, 5000, 3000, 9090) |
 | **SSH Key** | my-devops-key |
 
 ---
@@ -24,77 +24,43 @@
 
 | Service | URL |
 |---------|-----|
-| **Health Dashboard** | http://54.93.95.178 |
-| **Grafana** | http://54.93.95.178:3000 |
-| **Prometheus** | http://54.93.95.178:9090 |
+| **Health Dashboard** | http://35.158.171.183 |
+| **Health endpoint** | http://35.158.171.183/health |
+| **Grafana** | http://35.158.171.183:3000 |
+| **Prometheus** | http://35.158.171.183:9090 |
 
 ---
 
-## 🔌 How to Access the Server
+## 🔑 GitHub Secrets (updated)
+
+- `SERVER_HOST` = `35.158.171.183`
+- `SERVER_USER` = `ec2-user`
+- `SSH_PRIVATE_KEY` = updated with new Terraform key
+
+---
+
+## 📊 Monitoring Recovery
+
+Implemented:
+- Grafana auto-configuration script: `scripts/configure_grafana.sh`
+- Recovery dashboard JSON: `grafana/dashboard.json`
+- Loki persistence fix in `docker-compose.yml` + `monitoring/loki-config.yaml`
+
+---
+
+## 🧪 Verification Commands
 
 ```bash
-# SSH into the server
-ssh -i my-devops-key.pem ec2-user@54.93.95.178
-
-# Or use the Terraform output
-cd terraform/
-terraform output ssh_command
+curl http://35.158.171.183/health
+curl http://35.158.171.183:9090/-/ready
+curl http://35.158.171.183:3000/api/health
 ```
 
 ---
 
-## 🔑 GitHub Secrets Configured
-
-| Secret | Status | Description |
-|--------|--------|-------------|
-| `AWS_ACCESS_KEY_ID` | ✅ Set | AWS access key |
-| `AWS_SECRET_ACCESS_KEY` | ✅ Set | AWS secret key |
-| `DOCKER_HUB_TOKEN` | ✅ Set | Docker Hub auth token |
-| `SERVER_HOST` | ✅ Set | Server IP (54.93.95.178) |
-| `SERVER_USER` | ✅ Set | SSH user (ec2-user) |
-| `SSH_PRIVATE_KEY` | ✅ Set | SSH private key for deployment |
-
----
-
-## 📋 Next Steps
-
-1. **Deploy the application** using Ansible or manual SSH:
-   ```bash
-   cd ansible/
-   # Update inventory.ini with the server IP
-   ansible-playbook -i inventory.ini playbook.yml
-   ```
-
-2. **Verify application** is running:
-   ```bash
-   curl http://54.93.95.178/health
-   ```
-
-3. **Push to GitHub** to trigger CI/CD pipeline:
-   ```bash
-   git push origin main
-   ```
-
-4. **Monitor** via Grafana at http://54.93.95.178:3000
-
----
-
-## ⚠️ Important Notes
-
-- **Cost:** EC2 t3.micro is Free Tier eligible (750 hours/month for 12 months)
-- **Delete when done:** Run `terraform destroy` to avoid charges
-- **SSH key:** The private key (`my-devops-key.pem`) is stored locally and in GitHub Secrets
-- **Security:** Do NOT commit `my-devops-key.pem` or `.tfstate` files to Git
-- **Terraform state:** Stored locally in `terraform/terraform.tfstate` — do not delete unless you want to lose track of resources
-
----
-
-## 🗑️ How to Tear Down
+## 🗑️ Clean-up (to avoid AWS charges)
 
 ```bash
 cd terraform/
-export AWS_ACCESS_KEY_ID="your-key"
-export AWS_SECRET_ACCESS_KEY="your-secret"
-export AWS_DEFAULT_REGION="eu-central-1"
 terraform destroy -auto-approve
 ```

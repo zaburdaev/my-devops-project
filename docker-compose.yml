@@ -127,6 +127,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./monitoring/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki-data:/loki
     command: -config.file=/etc/loki/loki-config.yaml
     ports:
       - "3100:3100"
@@ -138,6 +139,7 @@ volumes:
   postgres-data:
   redis-data:
   grafana-data:
+  loki-data:
 
 # ---------- Networks ----------
 networks:
