@@ -1,94 +1,67 @@
 # 🚀 Deployment Summary — Health Dashboard
 
 > **Updated:** 2026-04-23  
-> **Author:** Vitalii Zaburdaiev | DevOpsUA6
-
----
+> **Status:** Final setup completed
 
 ## ✅ Current AWS Infrastructure
 
 | Resource | Details |
-|----------|---------|
+|---|---|
 | EC2 Instance ID | `i-0c4b446783b0704eb` |
 | Region | `eu-central-1` |
-| Instance Type | `t3.micro` (Free Tier target) |
+| Instance Type | `t3.micro` |
 | Elastic IP (Static) | `3.127.155.114` |
-| Dynamic instance public IP | managed by AWS (may change, do not use in docs/secrets) |
 | Security Group | `health-dashboard-sg` (22, 80, 443, 5000, 3000, 9090) |
 
-> Public access must use **Elastic IP** (`3.127.155.114`).
+> Use **Elastic IP** in docs/secrets and service links. This IP stays stable while the EIP resource remains allocated.
 
----
+## 🌐 Current Service URLs
 
-## 🌐 Service Access
+- Health Dashboard: http://3.127.155.114
+- Flask health endpoint: http://3.127.155.114:5000/health
+- Grafana: http://3.127.155.114:3000
+- Prometheus: http://3.127.155.114:9090
 
-| Service | URL |
-|---------|-----|
-| Health Dashboard | http://3.127.155.114 |
-| Health endpoint | http://3.127.155.114/health |
-| Grafana | http://3.127.155.114:3000 |
-| Prometheus | http://3.127.155.114:9090 |
-
----
-
-## 🔑 Required GitHub Secrets
+## 🔐 GitHub Secrets (Required)
 
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
 - `SSH_PRIVATE_KEY`
-- `SERVER_USER` = `ec2-user`
-- `SERVER_HOST` = `3.127.155.114` (Elastic IP)
+- `SERVER_USER=ec2-user`
+- `SERVER_HOST=3.127.155.114`
 
----
+## ♻️ Infrastructure Recovery Workflow
 
-## ♻️ Infrastructure Recovery (GitHub Actions)
+Workflow file: `.github/workflows/infrastructure-recovery.yml`
 
-Workflow: `.github/workflows/infrastructure-recovery.yml`
+Manual run:
+1. GitHub → **Actions**
+2. Select **Infrastructure Recovery**
+3. Click **Run workflow**
 
-What it does:
-1. Runs `terraform apply` in `terraform/`
-2. Gets `elastic_ip` from Terraform output
-3. Updates `SERVER_HOST` secret
-4. Connects to EC2 over SSH
-5. Pulls latest `main` and runs `docker compose up -d --build`
+The workflow will:
+1. run `terraform init/apply`
+2. read `terraform output -raw elastic_ip`
+3. update `SERVER_HOST`
+4. SSH into server and redeploy Docker stack
 
-Manual trigger:
-- GitHub → **Actions** → **Infrastructure Recovery** → **Run workflow**
+## 📊 Grafana Auto-Provisioning
 
----
+Provisioning source (mounted in Compose):
+- `./grafana/provisioning:/etc/grafana/provisioning`
 
-## 📊 Monitoring Auto-Provisioning
+Verified outcome:
+- Data sources created automatically: **Prometheus**, **Loki**
+- Dashboards auto-loaded from provisioning files
 
-Implemented via filesystem provisioning at startup:
+## 🧪 Verification
 
-- `grafana/provisioning/datasources/datasources.yml`
-- `grafana/provisioning/dashboards/dashboards.yml`
-- `grafana/provisioning/dashboards/health-dashboard.json`
+Executed `./verify_services.sh` successfully:
 
-And in Compose:
-- `docker-compose.yml` mounts `./grafana/provisioning:/etc/grafana/provisioning`
+- ✅ `http://3.127.155.114:5000/health`
+- ✅ `http://3.127.155.114:9090/-/healthy`
+- ✅ `http://3.127.155.114:3000/api/health`
 
-Prometheus scrape config:
-- `monitoring/prometheus.yml` with jobs `flask-app` and `prometheus`
+## 📄 Related Summary
 
----
-
-## 🧪 Quick Verification
-
-```bash
-curl http://3.127.155.114/health
-curl http://3.127.155.114:9090/-/ready
-curl http://3.127.155.114:3000/api/health
-```
-
----
-
-## 📚 Documentation Links
-
-- [README.md](./README.md)
-- [README_RU.md](./README_RU.md)
-- [docs/MONITORING.md](./docs/MONITORING.md)
-- [docs/AWS_DEPLOYMENT_RU.md](./docs/AWS_DEPLOYMENT_RU.md)
-- [docs/INFRASTRUCTURE_RECOVERY_RU.md](./docs/INFRASTRUCTURE_RECOVERY_RU.md)
-
----
+See full final report: `FINAL_SETUP_SUMMARY.md`
