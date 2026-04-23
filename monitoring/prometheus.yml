@@ -12,14 +12,12 @@ rule_files:
   # - "alert_rules.yml"
 
 scrape_configs:
+  # Scrape the Flask application metrics endpoint
+  - job_name: "flask-app"
+    static_configs:
+      - targets: ["app:5000"]
+
   # Scrape Prometheus itself
   - job_name: "prometheus"
     static_configs:
       - targets: ["localhost:9090"]
-
-  # Scrape the Flask Health Dashboard
-  - job_name: "health-dashboard"
-    scrape_interval: 10s
-    static_configs:
-      - targets: ["app:5000"]
-    metrics_path: /metrics

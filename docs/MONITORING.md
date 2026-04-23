@@ -107,7 +107,7 @@ Go to **Status** → **Targets** to see what Prometheus is scraping:
 | Target | Endpoint | Expected State |
 |--------|----------|:--------------:|
 | prometheus | localhost:9090 | ✅ UP |
-| health-dashboard | app:5000/metrics | ✅ UP |
+| flask-app | app:5000/metrics | ✅ UP |
 
 If a target shows "DOWN", the service may not be running.
 
@@ -145,7 +145,7 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  - job_name: "health-dashboard"  # Our Flask app
+  - job_name: "flask-app"  # Our Flask app
     scrape_interval: 10s          # Scrape more frequently
     metrics_path: "/metrics"
     static_configs:
@@ -177,7 +177,7 @@ Our project auto-configures two data sources for Grafana:
 | **Prometheus** | prometheus | http://prometheus:9090 | Metrics (CPU, memory, request rate) |
 | **Loki** | loki | http://loki:3100 | Application logs |
 
-> 💡 These are configured automatically via `monitoring/grafana/provisioning/datasources/datasources.yaml` — you don't need to set them up manually!
+> 💡 These are configured automatically via `grafana/provisioning/datasources/datasources.yml` — you don't need to set them up manually!
 
 ### Navigating Grafana
 
@@ -250,7 +250,7 @@ Loki is a **log aggregation system** designed to work with Grafana. Think of it 
 3. In the query box, try:
 
 ```logql
-{job="health-dashboard"}
+{job="flask-app"}
 ```
 
 4. Click **Run Query** to see the logs
@@ -259,16 +259,16 @@ Loki is a **log aggregation system** designed to work with Grafana. Think of it 
 
 ```logql
 # All logs from the app
-{job="health-dashboard"}
+{job="flask-app"}
 
 # Only error logs
-{job="health-dashboard"} |= "ERROR"
+{job="flask-app"} |= "ERROR"
 
 # Search for specific text
-{job="health-dashboard"} |= "health check"
+{job="flask-app"} |= "health check"
 
 # Parse JSON and filter
-{job="health-dashboard"} | json | level="ERROR"
+{job="flask-app"} | json | level="ERROR"
 ```
 
 ### Loki Configuration
@@ -371,7 +371,7 @@ groups:
           summary: "High memory usage detected"
 
       - alert: AppDown
-        expr: up{job="health-dashboard"} == 0
+        expr: up{job="flask-app"} == 0
         for: 1m
         labels:
           severity: critical
@@ -468,7 +468,7 @@ This script:
   - Memory usage
   - Request rate
   - Response time (p95)
-  - Container health status (`up{job="health-dashboard"}`)
+  - Container health status (`up{job="flask-app"}`)
 
 If Grafana shows **No data**, generate load and wait 30-60 seconds:
 

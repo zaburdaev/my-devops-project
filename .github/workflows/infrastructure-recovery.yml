@@ -1,0 +1,89 @@
+name: Infrastructure Recovery
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: terraform
+        run: terraform apply -auto-approve
+
+      - name: Get Server IP (Elastic IP)
+        id: get_ip
+        working-directory: terraform
+        run: echo "server_ip=$(terraform output -raw elastic_ip)" >> "$GITHUB_OUTPUT"
+
+      - name: Update GitHub Secrets
+        uses: gliech/create-github-secret-action@v1
+        with:
+          name: SERVER_HOST
+          value: ${{ steps.get_ip.outputs.server_ip }}
+          pa_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy Application
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ steps.get_ip.outputs.server_ip }}
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            echo "🚀 Starting deployment..."
+
+            # Install dependencies required for deployment
+            sudo dnf install -y git docker-buildx-plugin docker-compose-plugin || true
+            if ! command -v git >/dev/null 2>&1; then
+              sudo yum install -y git
+            fi
+
+            # Prepare target directory
+            sudo mkdir -p /opt
+            cd /opt
+
+            # First deployment: clone repository
+            if [ ! -d "health-dashboard/.git" ]; then
+              sudo rm -rf health-dashboard
+              sudo git clone https://github.com/zaburdaev/my-devops-project.git health-dashboard
+            fi
+
+            cd /opt/health-dashboard
+
+            # Refresh code
+            sudo git fetch origin
+            sudo git checkout main
+            sudo git pull origin main
+
+            # Ensure env file exists
+            if [ -f .env.example ] && [ ! -f .env ]; then
+              sudo cp .env.example .env
+            fi
+
+            # Start stack
+            sudo docker compose up -d --build
+
+            echo "✅ Recovery deployment complete"

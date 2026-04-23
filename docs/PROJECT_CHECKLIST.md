@@ -146,9 +146,9 @@ ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
 |-----------|--------------|-----------------|
 | Prometheus config | `monitoring/prometheus.yml` | Scrape targets configured |
 | Alert rules | `monitoring/alert_rules.yml` | CPU, memory, downtime alerts |
-| Grafana datasources | `monitoring/grafana/provisioning/datasources/` | Prometheus + Loki auto-configured |
-| Grafana dashboard | `monitoring/grafana/dashboards/health-dashboard.json` | 5 panels |
-| Dashboard provisioning | `monitoring/grafana/provisioning/dashboards/` | Auto-load config |
+| Grafana datasources | `grafana/provisioning/datasources/` | Prometheus + Loki auto-configured |
+| Grafana dashboard | `grafana/provisioning/dashboards/health-dashboard.json` | 5 panels |
+| Dashboard provisioning | `grafana/provisioning/dashboards/` | Auto-load config |
 | Loki configuration | `monitoring/loki-config.yaml` | Log aggregation setup |
 | App exposes metrics | `app/app.py` | `/metrics` endpoint |
 

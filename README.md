@@ -10,7 +10,7 @@
 > **Author:** Vitalii Zaburdaiev  
 > **Course:** DevOpsUA6  
 > **Docker Hub:** [oskalibriya/health-dashboard](https://hub.docker.com/r/oskalibriya/health-dashboard)  
-> **AWS:** Deployed at `54.93.95.178` ✅  
+> **AWS:** Deployed at `3.127.155.114` ✅  
 > **Description:** A full-stack DevOps project featuring a system health monitoring dashboard built with Flask, containerized with Docker, orchestrated with Kubernetes, provisioned with Terraform, configured with Ansible, and monitored with Prometheus + Grafana + Loki.
 
 🇷🇺 [Версия на русском](./README_RU.md)
@@ -171,10 +171,14 @@ my-devops-project/
 ├── monitoring/                   # 📊 Monitoring stack configuration
 │   ├── prometheus.yml            #    Prometheus scrape config
 │   ├── alert_rules.yml           #    Alerting rules (CPU, Memory, Downtime)
-│   ├── loki-config.yaml          #    Loki log aggregation config
-│   └── grafana/                  #    Grafana provisioning
-│       ├── dashboards/           #    Pre-built dashboard JSON
-│       └── provisioning/         #    Auto-provisioning for datasources
+│   └── loki-config.yaml          #    Loki log aggregation config
+├── grafana/                      # 📉 Grafana provisioning (auto-load)
+│   └── provisioning/
+│       ├── datasources/
+│       │   └── datasources.yml   #    Prometheus + Loki datasources
+│       └── dashboards/
+│           ├── dashboards.yml    #    Dashboard provider config
+│           └── health-dashboard.json
 ├── terraform/                    # 🏗️ Infrastructure as Code (AWS)
 │   ├── main.tf                   #    EC2 instance + Security Group
 │   ├── variables.tf              #    Input variables (region, type, key)
@@ -193,8 +197,9 @@ my-devops-project/
 │   ├── service.yaml              #    LoadBalancer service
 │   └── helm/                     #    Helm chart
 │       └── health-dashboard/     #    Chart templates & values
-├── .github/workflows/            # 🔄 CI/CD Pipeline
-│   └── ci-cd.yml                 #    GitHub Actions workflow
+├── .github/workflows/            # 🔄 CI/CD + Recovery Workflows
+│   ├── ci-cd.yml                 #    Main pipeline (test/build/deploy)
+│   └── infrastructure-recovery.yml #  Manual infra recovery workflow
 ├── docs/                         # 📚 Detailed documentation
 │   ├── GETTING_STARTED.md        #    Beginner setup guide
 │   ├── ARCHITECTURE.md           #    System architecture
@@ -268,6 +273,7 @@ This project includes comprehensive documentation for every aspect:
 | 📘 [Руководство для начинающих](./docs/BEGINNER_GUIDE_RU.md) | Complete beginner guide (Russian) |
 | 🎬 [Сценарий демонстрации](./docs/DEMO_SCRIPT_RU.md) | Demo script for project defense (Russian) |
 | ☁️ [AWS деплой](./docs/AWS_DEPLOYMENT_RU.md) | AWS deployment guide (Russian) |
+| ♻️ [Recovery runbook RU](./docs/INFRASTRUCTURE_RECOVERY_RU.md) | Infrastructure recovery guide (Russian) |
 | 🚀 [Deployment Summary](./DEPLOYMENT_SUMMARY.md) | Deployed infrastructure summary |
 | 🔒 [Security Audit](./SECURITY_AUDIT.md) | Security audit results |
 | 📋 [Documentation Status](./DOCUMENTATION_STATUS.md) | Full documentation status report |
@@ -280,11 +286,34 @@ The application is **deployed and running** on AWS:
 
 | Service | URL |
 |---------|-----|
-| **Health Dashboard** | http://54.93.95.178 |
-| **Grafana** | http://54.93.95.178:3000 |
-| **Prometheus** | http://54.93.95.178:9090 |
+| **Health Dashboard** | http://3.127.155.114 |
+| **Grafana** | http://3.127.155.114:3000 |
+| **Prometheus** | http://3.127.155.114:9090 |
 
-> 📖 See [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md) and [docs/AWS_DEPLOYMENT_RU.md](./docs/AWS_DEPLOYMENT_RU.md) for details.
+### Elastic IP (Static)
+
+Infrastructure now uses an **AWS Elastic IP** (`3.127.155.114`), so public access IP remains stable even if EC2 is recreated.
+
+You can always get the current static IP from Terraform:
+
+```bash
+cd terraform
+terraform output -raw elastic_ip
+```
+
+### Infrastructure Recovery (GitHub Actions)
+
+If server resources are deleted or become inconsistent:
+
+1. Open **GitHub → Actions → Infrastructure Recovery**
+2. Click **Run workflow**
+3. Workflow recreates/repairs infrastructure via Terraform
+4. Reads `elastic_ip` output and updates `SERVER_HOST`
+5. Re-deploys application via SSH
+
+Workflow file: [`.github/workflows/infrastructure-recovery.yml`](./.github/workflows/infrastructure-recovery.yml)
+
+> 📖 See [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md), [docs/AWS_DEPLOYMENT_RU.md](./docs/AWS_DEPLOYMENT_RU.md), and [docs/INFRASTRUCTURE_RECOVERY_RU.md](./docs/INFRASTRUCTURE_RECOVERY_RU.md) for details.
 
 ---
 

@@ -5,7 +5,7 @@ This file lists all documentation created for the **Health Monitoring Dashboard*
 > **Project:** my-devops-project  
 > **Author:** Vitalii Zaburdaiev  
 > **GitHub:** [github.com/zaburdaev/my-devops-project](https://github.com/zaburdaev/my-devops-project)  
-> **AWS:** Deployed at `54.93.95.178` ✅
+> **AWS:** Deployed at `3.127.155.114` ✅
 
 ---
 
@@ -34,21 +34,22 @@ This file lists all documentation created for the **Health Monitoring Dashboard*
 | 12 | [docs/BEGINNER_GUIDE_RU.md](./docs/BEGINNER_GUIDE_RU.md) | Полное руководство для начинающих — 13 технологий, структура проекта, FAQ | Студенты |
 | 13 | [docs/DEMO_SCRIPT_RU.md](./docs/DEMO_SCRIPT_RU.md) | Сценарий демонстрации — пошаговый скрипт для защиты проекта | Студенты, Преподаватели |
 | 14 | [docs/AWS_DEPLOYMENT_RU.md](./docs/AWS_DEPLOYMENT_RU.md) | Руководство по развёртыванию на AWS — Terraform, настройка, деплой | DevOps-инженеры |
+| 15 | [docs/INFRASTRUCTURE_RECOVERY_RU.md](./docs/INFRASTRUCTURE_RECOVERY_RU.md) | Recovery runbook: Elastic IP, GitHub Actions восстановление, troubleshooting | DevOps-инженеры |
 
 ### Project Status Documents
 
 | # | File | Description | Audience |
 |---|------|-------------|----------|
-| 15 | [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md) | Сводка развёрнутой инфраструктуры AWS | Everyone |
-| 16 | [SECURITY_AUDIT.md](./SECURITY_AUDIT.md) | Результаты аудита безопасности | Reviewers |
-| 17 | [DOCUMENTATION_STATUS.md](./DOCUMENTATION_STATUS.md) | Полный статус всей документации | Everyone |
-| 18 | [GITHUB_SETUP.md](./GITHUB_SETUP.md) | Настройка GitHub: Actions, Secrets, Pipeline | Developers |
+| 16 | [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md) | Сводка развёрнутой инфраструктуры AWS | Everyone |
+| 17 | [SECURITY_AUDIT.md](./SECURITY_AUDIT.md) | Результаты аудита безопасности | Reviewers |
+| 18 | [DOCUMENTATION_STATUS.md](./DOCUMENTATION_STATUS.md) | Полный статус всей документации | Everyone |
+| 19 | [GITHUB_SETUP.md](./GITHUB_SETUP.md) | Настройка GitHub: Actions, Secrets, Pipeline | Developers |
 
 ---
 
 ## 📊 Documentation Statistics
 
-- **Total files:** 18
+- **Total files:** 19
 - **Languages:** English, Russian (🇷🇺)
 - **Format:** Markdown (.md) + PDF versions
 - **Total sections covered:** 100+
@@ -80,7 +81,8 @@ my-devops-project/
     ├── PROJECT_CHECKLIST.md         # Submission checklist (EN)
     ├── BEGINNER_GUIDE_RU.md         # Beginner guide (RU)
     ├── DEMO_SCRIPT_RU.md            # Demo script (RU)
-    └── AWS_DEPLOYMENT_RU.md         # AWS deployment (RU)
+    ├── AWS_DEPLOYMENT_RU.md         # AWS deployment (RU)
+    └── INFRASTRUCTURE_RECOVERY_RU.md # Recovery runbook (RU)
 ```
 
 ---

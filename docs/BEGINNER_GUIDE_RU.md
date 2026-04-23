@@ -342,8 +342,8 @@ Grafana — инструмент для создания красивых даш
 - Готовый дашборд «Health Dashboard» уже настроен
 
 **Где в проекте?**
-- `monitoring/grafana/provisioning/` — автоматическая настройка
-- `monitoring/grafana/dashboards/health-dashboard.json` — готовый дашборд
+- `grafana/provisioning/` — автоматическая настройка
+- `grafana/provisioning/dashboards/health-dashboard.json` — готовый дашборд
 - Доступна по адресу: `http://localhost:3000` (admin/admin)
 
 ---

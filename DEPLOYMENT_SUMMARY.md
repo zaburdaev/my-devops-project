@@ -1,66 +1,94 @@
 # 🚀 Deployment Summary — Health Dashboard
 
-> **Redeployed:** 2026-04-23  
+> **Updated:** 2026-04-23  
 > **Author:** Vitalii Zaburdaiev | DevOpsUA6
 
 ---
 
-## ✅ New AWS Infrastructure
+## ✅ Current AWS Infrastructure
 
 | Resource | Details |
 |----------|---------|
-| **EC2 Instance** | t3.micro (Free Tier) |
-| **Instance ID** | i-0c4b446783b0704eb |
-| **Server IP** | 35.158.171.183 |
-| **Region** | eu-central-1 (Frankfurt) |
-| **OS** | Amazon Linux 2023 |
-| **Disk** | 30 GB gp3 SSD |
-| **Security Group** | health-dashboard-sg (22, 80, 443, 5000, 3000, 9090) |
-| **SSH Key** | my-devops-key |
+| EC2 Instance ID | `i-0c4b446783b0704eb` |
+| Region | `eu-central-1` |
+| Instance Type | `t3.micro` (Free Tier target) |
+| Elastic IP (Static) | `3.127.155.114` |
+| Dynamic instance public IP | managed by AWS (may change, do not use in docs/secrets) |
+| Security Group | `health-dashboard-sg` (22, 80, 443, 5000, 3000, 9090) |
+
+> Public access must use **Elastic IP** (`3.127.155.114`).
 
 ---
 
-## 🔗 Access URLs
+## 🌐 Service Access
 
 | Service | URL |
 |---------|-----|
-| **Health Dashboard** | http://35.158.171.183 |
-| **Health endpoint** | http://35.158.171.183/health |
-| **Grafana** | http://35.158.171.183:3000 |
-| **Prometheus** | http://35.158.171.183:9090 |
+| Health Dashboard | http://3.127.155.114 |
+| Health endpoint | http://3.127.155.114/health |
+| Grafana | http://3.127.155.114:3000 |
+| Prometheus | http://3.127.155.114:9090 |
 
 ---
 
-## 🔑 GitHub Secrets (updated)
+## 🔑 Required GitHub Secrets
 
-- `SERVER_HOST` = `35.158.171.183`
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `SSH_PRIVATE_KEY`
 - `SERVER_USER` = `ec2-user`
-- `SSH_PRIVATE_KEY` = updated with new Terraform key
+- `SERVER_HOST` = `3.127.155.114` (Elastic IP)
 
 ---
 
-## 📊 Monitoring Recovery
+## ♻️ Infrastructure Recovery (GitHub Actions)
 
-Implemented:
-- Grafana auto-configuration script: `scripts/configure_grafana.sh`
-- Recovery dashboard JSON: `grafana/dashboard.json`
-- Loki persistence fix in `docker-compose.yml` + `monitoring/loki-config.yaml`
+Workflow: `.github/workflows/infrastructure-recovery.yml`
+
+What it does:
+1. Runs `terraform apply` in `terraform/`
+2. Gets `elastic_ip` from Terraform output
+3. Updates `SERVER_HOST` secret
+4. Connects to EC2 over SSH
+5. Pulls latest `main` and runs `docker compose up -d --build`
+
+Manual trigger:
+- GitHub → **Actions** → **Infrastructure Recovery** → **Run workflow**
 
 ---
 
-## 🧪 Verification Commands
+## 📊 Monitoring Auto-Provisioning
+
+Implemented via filesystem provisioning at startup:
+
+- `grafana/provisioning/datasources/datasources.yml`
+- `grafana/provisioning/dashboards/dashboards.yml`
+- `grafana/provisioning/dashboards/health-dashboard.json`
+
+And in Compose:
+- `docker-compose.yml` mounts `./grafana/provisioning:/etc/grafana/provisioning`
+
+Prometheus scrape config:
+- `monitoring/prometheus.yml` with jobs `flask-app` and `prometheus`
+
+---
+
+## 🧪 Quick Verification
 
 ```bash
-curl http://35.158.171.183/health
-curl http://35.158.171.183:9090/-/ready
-curl http://35.158.171.183:3000/api/health
+curl http://3.127.155.114/health
+curl http://3.127.155.114:9090/-/ready
+curl http://3.127.155.114:3000/api/health
 ```
 
 ---
 
-## 🗑️ Clean-up (to avoid AWS charges)
+## 📚 Documentation Links
 
-```bash
-cd terraform/
-terraform destroy -auto-approve
-```
+- [README.md](./README.md)
+- [README_RU.md](./README_RU.md)
+- [docs/MONITORING.md](./docs/MONITORING.md)
+- [docs/AWS_DEPLOYMENT_RU.md](./docs/AWS_DEPLOYMENT_RU.md)
+- [docs/INFRASTRUCTURE_RECOVERY_RU.md](./docs/INFRASTRUCTURE_RECOVERY_RU.md)
+
+---

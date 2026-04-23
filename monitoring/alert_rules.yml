@@ -28,7 +28,7 @@ groups:
 
       # Alert when the app is down
       - alert: AppDown
-        expr: up{job="health-dashboard"} == 0
+        expr: up{job="flask-app"} == 0
         for: 1m
         labels:
           severity: critical

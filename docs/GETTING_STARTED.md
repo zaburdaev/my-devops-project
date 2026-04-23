@@ -428,7 +428,7 @@ pip install -r requirements.txt
 **Solution:**
 1. Wait 30-60 seconds for Prometheus to collect data
 2. Check Prometheus targets: [http://localhost:9090/targets](http://localhost:9090/targets) — all targets should be "UP"
-3. Grafana datasources should be auto-configured — if not, check `monitoring/grafana/provisioning/`
+3. Grafana datasources should be auto-configured — if not, check `grafana/provisioning/`
 
 ---
 

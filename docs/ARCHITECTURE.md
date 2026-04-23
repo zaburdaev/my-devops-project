@@ -187,7 +187,7 @@ The Health Monitoring Dashboard is a **microservices-based** application compose
 - **Image:** `grafana/grafana`
 - **Port:** 3000 (exposed to the host)
 - **Default login:** admin / admin
-- **Provisioning:** Auto-configured datasources and dashboards via `monitoring/grafana/provisioning/`
+- **Provisioning:** Auto-configured datasources and dashboards via `grafana/provisioning/`
 - **Data persistence:** `grafana_data` Docker volume
 
 > 💡 **Why Grafana?** It's the go-to tool for visualizing monitoring data. It supports dozens of data sources and is highly customizable.

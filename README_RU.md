@@ -10,7 +10,7 @@
 > **Автор:** Виталий Забурдаев  
 > **Курс:** DevOpsUA6  
 > **Docker Hub:** [oskalibriya/health-dashboard](https://hub.docker.com/r/oskalibriya/health-dashboard)  
-> **AWS:** Развёрнут на `54.93.95.178`  
+> **AWS:** Развёрнут на `3.127.155.114`  
 > **Описание:** Полноценный DevOps-проект: дашборд мониторинга системного здоровья на Flask, контейнеризация Docker, оркестрация Kubernetes, инфраструктура Terraform, конфигурация Ansible, мониторинг Prometheus + Grafana + Loki.
 
 🌍 [English version](./README.md)
@@ -85,7 +85,7 @@
 - ✅ **Мониторинг** — Prometheus + Grafana + Loki
 - ✅ **Тесты** — 12 unit-тестов + линтинг
 - ✅ **Безопасность** — non-root контейнер, секреты, заголовки безопасности
-- ✅ **AWS деплой** — развёрнут на EC2 (54.93.95.178)
+- ✅ **AWS деплой** — развёрнут на EC2 (3.127.155.114)
 
 ---
 
@@ -141,6 +141,7 @@ docker-compose up -d --build
 | 📘 [Руководство для начинающих](./docs/BEGINNER_GUIDE_RU.md) | Полное руководство с объяснением всех технологий |
 | 🎬 [Сценарий демонстрации](./docs/DEMO_SCRIPT_RU.md) | Пошаговый скрипт для защиты проекта |
 | ☁️ [AWS деплой](./docs/AWS_DEPLOYMENT_RU.md) | Подробная инструкция по развёртыванию на AWS |
+| ♻️ [Восстановление инфраструктуры](./docs/INFRASTRUCTURE_RECOVERY_RU.md) | Полный recovery runbook (RU) |
 | 🚀 [Итоги деплоя](./DEPLOYMENT_SUMMARY.md) | Сводка развёрнутой инфраструктуры |
 | 🔒 [Аудит безопасности](./SECURITY_AUDIT.md) | Результаты проверки безопасности |
 | 📋 [Статус документации](./DOCUMENTATION_STATUS.md) | Полный статус всей документации |
@@ -196,7 +197,7 @@ GitHub Actions пайплайн (`ci-cd.yml`) запускается при ка
 
 | Компонент | Статус |
 |-----------|--------|
-| **AWS EC2** | ✅ Развёрнут (54.93.95.178) |
+| **AWS EC2** | ✅ Развёрнут (3.127.155.114) |
 | **CI/CD Pipeline** | ✅ Работает (GitHub Actions) |
 | **Docker Hub** | ✅ Образ опубликован |
 | **Тесты** | ✅ 12/12 пройдены |
@@ -207,9 +208,26 @@ GitHub Actions пайплайн (`ci-cd.yml`) запускается при ка
 
 | Сервис | URL |
 |--------|-----|
-| Health Dashboard | http://54.93.95.178 |
-| Grafana | http://54.93.95.178:3000 |
-| Prometheus | http://54.93.95.178:9090 |
+| Health Dashboard | http://3.127.155.114 |
+| Grafana | http://3.127.155.114:3000 |
+| Prometheus | http://3.127.155.114:9090 |
+
+### Elastic IP (статический IP)
+
+Проект использует **AWS Elastic IP** `3.127.155.114`, поэтому внешний IP остаётся стабильным даже при пересоздании EC2.
+
+```bash
+cd terraform
+terraform output -raw elastic_ip
+```
+
+### Восстановление инфраструктуры через GitHub Actions
+
+1. GitHub → **Actions** → **Infrastructure Recovery**
+2. Нажать **Run workflow**
+3. Workflow выполнит `terraform apply`, получит `elastic_ip`, обновит `SERVER_HOST` и выполнит деплой
+
+Workflow файл: [`.github/workflows/infrastructure-recovery.yml`](./.github/workflows/infrastructure-recovery.yml)
 
 ---
 

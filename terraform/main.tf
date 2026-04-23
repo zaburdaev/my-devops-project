@@ -174,3 +174,19 @@ resource "aws_instance" "health_dashboard" {
     Author  = "Vitalii Zaburdaiev"
   }
 }
+
+# ---------- Elastic IP (Static Public IP) ----------
+resource "aws_eip" "app_eip" {
+  domain = "vpc"
+
+  tags = {
+    Name    = "health-dashboard-eip"
+    Project = "my-devops-project"
+    Author  = "Vitalii Zaburdaiev"
+  }
+}
+
+resource "aws_eip_association" "app_eip_assoc" {
+  instance_id   = aws_instance.health_dashboard.id
+  allocation_id = aws_eip.app_eip.id
+}

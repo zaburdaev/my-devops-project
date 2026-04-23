@@ -324,6 +324,14 @@ GitHub Secrets are encrypted environment variables that your workflow can use. T
 | `AWS_ACCESS_KEY_ID` | AWS credentials (for Terraform) | AWS IAM Console |
 | `AWS_SECRET_ACCESS_KEY` | AWS credentials (for Terraform) | AWS IAM Console |
 
+### Infrastructure Recovery Workflow
+
+In addition to the main CI/CD workflow, the project includes a manual recovery workflow:
+
+- File: `.github/workflows/infrastructure-recovery.yml`
+- Trigger: `workflow_dispatch`
+- Purpose: recreate/repair infra with Terraform, read `elastic_ip`, update `SERVER_HOST`, redeploy app via SSH
+
 ### How to Add a Secret
 
 1. Go to your repository on GitHub
