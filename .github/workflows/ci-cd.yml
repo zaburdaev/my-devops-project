@@ -118,25 +118,40 @@ jobs:
           script: |
             set -e
 
-            # Navigate to project directory
-            cd /opt/health-dashboard || exit 1
+            APP_DIR=/opt/health-dashboard
+            REPO_URL=https://github.com/${{ github.repository }}.git
 
-            # Pull latest changes
-            sudo git pull origin main || exit 1
+            # First deploy: clone repository if missing
+            if [ ! -d "$APP_DIR/.git" ]; then
+              echo "📦 First deployment - cloning repository..."
+              sudo mkdir -p /opt
+              sudo rm -rf "$APP_DIR"
+              sudo git clone --depth=1 "$REPO_URL" "$APP_DIR"
+            fi
+
+            # Navigate to project directory
+            cd "$APP_DIR" || exit 1
+
+            # Ensure clean git state before syncing (avoids merge conflicts on server)
+            sudo git fetch origin main
+            sudo git reset --hard origin/main
+            sudo git clean -fd
 
             # Stop services gracefully
             sudo docker compose down || true
 
-            # Update .env
-            sudo cp .env.example .env || exit 1
+            # Create .env only if missing (do not overwrite server-specific values)
+            if [ ! -f .env ]; then
+              sudo cp .env.example .env || exit 1
+            fi
 
             # Start only essential services first
             sudo docker compose up -d postgres redis
-            sleep 5
+            sleep 8
 
             # Then start app
             sudo docker compose up -d app
-            sleep 5
+            sleep 8
 
             # Finally monitoring
             sudo docker compose up -d prometheus grafana nginx
