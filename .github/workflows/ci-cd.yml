@@ -113,78 +113,36 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 5m
+          command_timeout: 10m
           script: |
-            echo "🚀 Starting deployment..."
+            set -e
 
-            # Install git if not present
-            if ! command -v git &> /dev/null; then
-              echo "📦 Installing git..."
-              sudo dnf install -y git || sudo yum install -y git
-            fi
+            # Navigate to project directory
+            cd /opt/health-dashboard || exit 1
 
-            # Install Docker Buildx if not present
-            if ! docker buildx version &> /dev/null; then
-              echo "📦 Installing Docker Buildx..."
-              sudo mkdir -p /usr/local/lib/docker/cli-plugins/
-              sudo curl -SL "https://github.com/docker/buildx/releases/download/v0.21.1/buildx-v0.21.1.linux-amd64" -o /usr/local/lib/docker/cli-plugins/docker-buildx
-              sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
-            fi
+            # Pull latest changes
+            sudo git pull origin main || exit 1
 
-            # Install Docker Compose plugin if not present
-            if ! docker compose version &> /dev/null; then
-              echo "📦 Installing Docker Compose plugin..."
-              sudo mkdir -p /usr/local/lib/docker/cli-plugins/
-              sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/lib/docker/cli-plugins/docker-compose
-              sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-            fi
+            # Stop services gracefully
+            sudo docker compose down || true
 
-            # Create directory if it doesn't exist
-            sudo mkdir -p /opt/health-dashboard
+            # Update .env
+            sudo cp .env.example .env || exit 1
 
-            # Check if it's first deploy (no .git directory)
-            if [ ! -d "/opt/health-dashboard/.git" ]; then
-              echo "📦 First deployment — cloning repository..."
-              cd /opt
-              sudo rm -rf /opt/health-dashboard
-              sudo git clone https://github.com/${{ github.repository }}.git /opt/health-dashboard
-              sudo chown -R $(whoami):$(whoami) /opt/health-dashboard
-            else
-              echo "🔄 Updating existing deployment..."
-              cd /opt/health-dashboard
-              git pull origin main
-            fi
+            # Start only essential services first
+            sudo docker compose up -d postgres redis
+            sleep 5
 
-            # Go to project directory
-            cd /opt/health-dashboard
+            # Then start app
+            sudo docker compose up -d app
+            sleep 5
 
-            # Create .env file if it doesn't exist
-            if [ ! -f ".env" ]; then
-              echo "📝 Creating .env from .env.example..."
-              if [ -f ".env.example" ]; then
-                cp .env.example .env
-              else
-                echo "⚠️ .env.example not found, creating minimal .env"
-                echo "FLASK_DEBUG=0" > .env
-                echo "SECRET_KEY=change-me-in-production" >> .env
-                echo "POSTGRES_HOST=postgres" >> .env
-                echo "POSTGRES_PORT=5432" >> .env
-                echo "POSTGRES_DB=health_dashboard" >> .env
-                echo "POSTGRES_USER=postgres" >> .env
-                echo "POSTGRES_PASSWORD=changeme" >> .env
-                echo "REDIS_HOST=redis" >> .env
-                echo "REDIS_PORT=6379" >> .env
-              fi
-            fi
+            # Finally monitoring
+            sudo docker compose up -d prometheus grafana nginx
 
-            # Build and start services
-            echo "🐳 Building and starting services..."
-            docker compose up -d --build || { echo "❌ Failed to start containers"; exit 1; }
-
-            # Show status
-            echo "📊 Service status:"
-            docker compose ps
-
-            echo "✅ Deployment complete!"
+            # Verify
+            sudo docker compose ps
 
       - name: Deployment skipped
         if: steps.check_secrets.outputs.configured != 'true'
