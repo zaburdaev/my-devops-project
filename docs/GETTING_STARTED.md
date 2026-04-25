@@ -4,6 +4,73 @@ Welcome! This guide will walk you through setting up the **Health Monitoring Das
 
 ---
 
+## Local Development Setup
+
+### Step 1: Prerequisites
+
+Ensure you have installed:
+- Docker 20.10+
+- Docker Compose v2+
+- Git 2.30+
+
+### Step 2: Clone and Setup
+
+```bash
+# Clone repository
+git clone https://github.com/zaburdaev/my-devops-project.git
+cd my-devops-project
+
+# Create environment file
+cp .env.example .env
+
+# (Optional) Edit .env if you want custom passwords
+nano .env
+```
+
+### Step 3: Build and Run
+
+```bash
+# Build and start all services
+docker compose up --build -d
+
+# Check logs
+docker compose logs -f
+
+# Verify all containers are running
+docker compose ps
+```
+
+### Step 4: Verify Installation
+
+```bash
+# Test application
+curl http://localhost:5000/health
+
+# Should return: {"status":"healthy"}
+```
+
+### Troubleshooting
+
+#### Build Error: gcc not found
+**Problem:** `psutil` package fails to compile
+
+**Solution:** Make sure you're using the updated Dockerfile that includes:
+```dockerfile
+RUN apt-get update && apt-get install -y gcc python3-dev
+```
+
+#### Error: DATABASE_URL not set
+**Problem:** Missing environment variables
+
+**Solution:**
+```bash
+cp .env.example .env
+docker compose down
+docker compose up --build
+```
+
+---
+
 ## 📋 Table of Contents
 
 - [Prerequisites](#-prerequisites)

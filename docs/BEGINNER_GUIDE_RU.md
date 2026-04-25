@@ -11,7 +11,7 @@
 2. [Технологии в проекте](#2--технологии-в-проекте)
 3. [Структура проекта](#3--структура-проекта)
 4. [Как это работает](#4--как-это-работает)
-5. [Как запустить проект локально](#5--как-запустить-проект-локально)
+5. [Запуск на своём компьютере](#5--запуск-на-своём-компьютере)
 6. [Как демонстрировать проект преподавателю](#6--как-демонстрировать-проект-преподавателю)
 7. [Частые вопросы и ответы](#7--частые-вопросы-и-ответы)
 8. [Чек-лист перед защитой](#8--чек-лист-перед-защитой)
@@ -553,134 +553,143 @@ Flask-приложение                    Prometheus
 
 ---
 
-## 5. 🚀 Как запустить проект локально
+## 5. 🚀 Запуск на своём компьютере
 
-### Шаг 1: Установи Docker Desktop
+### Шаг 1: Установить Docker
 
 **Windows:**
-1. Скачай с [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
-2. Установи (Next → Next → Finish)
-3. Перезагрузи компьютер
-4. Открой Docker Desktop — подожди пока значок в трее станет зелёным
+1. Скачай Docker Desktop с https://www.docker.com/products/docker-desktop
+2. Установи (требуется перезагрузка)
+3. Запусти Docker Desktop
 
-**Mac:**
-1. Скачай с [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
-2. Перетащи в Applications
-3. Запусти и подожди
-
-**Linux:**
+**Linux (Ubuntu):**
 ```bash
-# Ubuntu/Debian
 sudo apt update
-sudo apt install docker.io docker-compose
+sudo apt install docker.io docker-compose-v2
 sudo usermod -aG docker $USER
-# Перелогинься
+# Перезайти в систему
 ```
 
-**Проверка установки:**
-```bash
-docker --version        # Должно показать версию
-docker-compose --version # Должно показать версию
-```
-
-### Шаг 2: Клонируй репозиторий
+### Шаг 2: Скачать проект
 
 ```bash
 git clone https://github.com/zaburdaev/my-devops-project.git
 cd my-devops-project
 ```
 
-### Шаг 3: Настрой .env файл
+### Шаг 3: Создать файл .env
+
+**ВАЖНО!** Без этого файла проект не запустится!
 
 ```bash
-# Скопируй пример
+# Скопировать шаблон
 cp .env.example .env
 
-# Можешь оставить значения по умолчанию для локального запуска
-# Или отредактируй .env файл
+# Файл .env уже содержит все нужные настройки
+# Можно не редактировать для локального запуска
 ```
 
-Содержимое `.env` для локального запуска (можно не менять):
-```
-FLASK_DEBUG=false
-SECRET_KEY=my-local-secret-key
-APP_PORT=5000
-POSTGRES_HOST=postgres
-POSTGRES_PORT=5432
-POSTGRES_DB=healthdb
-POSTGRES_USER=admin
-POSTGRES_PASSWORD=changeme
-REDIS_HOST=redis
-REDIS_PORT=6379
-GF_SECURITY_ADMIN_USER=admin
-GF_SECURITY_ADMIN_PASSWORD=admin
-```
-
-### Шаг 4: Запусти проект
+### Шаг 4: Запустить проект
 
 ```bash
-# Запусти все сервисы
-docker-compose up -d
+# Собрать и запустить все контейнеры
+docker compose up --build
 
-# Или через Makefile:
-make up
+# Дождаться сообщения "Application startup complete"
 ```
 
-Подожди 30-60 секунд, пока все сервисы запустятся.
+### Шаг 5: Проверить что работает
 
-### Шаг 5: Проверь, что всё работает
+Открой в браузере:
+- http://localhost:5000/health - должно показать `{"status":"healthy"}`
+- http://localhost:3000 - Grafana (admin/admin)
 
+---
+
+## ⚠️ Типичные проблемы и решения
+
+### Проблема 1: Ошибка при сборке psutil
+
+**Симптомы:**
+```
+error: command 'gcc' failed: No such file or directory
+building 'psutil._psutil_linux' extension failed
+```
+
+**Причина:** Отсутствуют системные зависимости для компиляции
+
+**Решение:**
+Проект уже содержит исправленный Dockerfile с gcc и python3-dev.
+Просто обнови код:
 ```bash
-# Посмотри статус контейнеров
-docker-compose ps
-
-# Все контейнеры должны быть в статусе "Up" или "healthy"
+git pull origin main
+docker compose build --no-cache
+docker compose up
 ```
 
-Ожидаемый результат:
+### Проблема 2: Ошибка "DATABASE_URL not set"
+
+**Симптомы:**
 ```
-NAME                STATUS
-app                 Up (healthy)
-postgres            Up (healthy)
-redis               Up (healthy)
-nginx               Up
-prometheus          Up
-grafana             Up
-# Loki удалён в оптимизированной конфигурации
+KeyError: 'DATABASE_URL'
+Environment variable DATABASE_URL is required
 ```
 
-### Шаг 6: Открой в браузере
+**Причина:** Отсутствует файл .env
 
-| Сервис | URL | Описание |
-|--------|-----|----------|
-| 🌐 Приложение | http://localhost (или :80) | Health Dashboard |
-| 🌐 Приложение (напрямую) | http://localhost:5000 | Flask без Nginx |
-| 📊 Grafana | http://localhost:3000 | Дашборды (логин/пароль из `.env`) |
-| 📈 Prometheus | http://localhost:9090 | Метрики |
-| ❤️ Health check | http://localhost:5000/health | JSON-ответ |
-| 📊 Metrics | http://localhost:5000/metrics | Prometheus-метрики |
-| ℹ️ System info | http://localhost:5000/api/system-info | Информация о системе |
-
-### Шаг 7: Проверь Grafana
-
-1. Открой http://localhost:3000
-2. Логин: `admin` / Пароль: `admin`
-3. Перейди в **Dashboards** → **Health Dashboard**
-4. Ты увидишь графики CPU, RAM, Disk
-
-### Шаг 8: Посмотри логи
-
+**Решение:**
 ```bash
-# Логи всех сервисов
-docker-compose logs
+# Создать файл из шаблона
+cp .env.example .env
 
-# Логи конкретного сервиса
-docker-compose logs app
-docker-compose logs postgres
-
-# Логи в реальном времени
-docker-compose logs -f app
+# Перезапустить контейнеры
+docker compose down
+docker compose up
 ```
+
+### Проблема 3: Warning about deprecated 'version'
+
+**Симптомы:**
+```
+WARN[0000] version is obsolete
+```
+
+**Причина:** Старая версия docker-compose.yml
+
+**Решение:**
+Проект уже обновлён. Обнови код:
+```bash
+git pull origin main
+```
+
+### Проблема 4: Порты уже заняты
+
+**Симптомы:**
+```
+Error: port is already allocated
+Bind for 0.0.0.0:5000 failed
+```
+
+**Причина:** Другое приложение использует нужный порт
+
+**Решение:**
+```bash
+# Найти процесс занимающий порт 5000
+sudo lsof -i :5000
+
+# Остановить его или изменить порт в docker-compose.yml
+```
+
+---
+
+## ✅ Контрольный список
+
+Перед запуском убедись:
+- [x] Docker установлен и запущен
+- [x] Код скачан: `git clone ...`
+- [x] Файл .env создан: `cp .env.example .env`
+- [x] Порты свободны: 5000, 3000, 9090, 5432, 6379
+- [x] Интернет работает (для скачивания образов)
 
 ---
 

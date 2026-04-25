@@ -102,52 +102,53 @@ This project was created as a comprehensive DevOps course project (DevOpsUA6) to
 
 ### Prerequisites
 
-You only need these two tools installed on your machine:
+- Docker and Docker Compose installed
+- Git installed
 
-- [Docker](https://docs.docker.com/get-docker/) (v20+)
-- [Docker Compose](https://docs.docker.com/compose/install/) (v2+)
+### Local Deployment
 
-### 1️⃣ Clone the Repository
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/zaburdaev/my-devops-project.git
+   cd my-devops-project
+   ```
 
-```bash
-git clone https://github.com/zaburdaev/my-devops-project.git
-cd my-devops-project
+2. **Create environment file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit `.env` if needed (default values work for local development).
+
+3. **Build and run:**
+   ```bash
+   docker compose up --build
+   ```
+
+4. **Access the application:**
+   - Application: http://localhost:5000
+   - Health Check: http://localhost:5000/health
+   - Grafana: http://localhost:3000 (admin/admin)
+   - Prometheus: http://localhost:9090
+
+### Common Issues
+
+**Issue: `psutil` build fails**
+```
+Solution: The Dockerfile includes gcc and python3-dev dependencies.
+If you still face issues, ensure you're using the latest Dockerfile.
 ```
 
-### 2️⃣ Configure Environment
-
+**Issue: Missing environment variables**
 ```bash
-# Copy the example environment file
+Solution: Make sure you created the .env file:
 cp .env.example .env
-
-# (Optional) Edit .env with your own values — defaults work for local development
 ```
 
-### 3️⃣ Build and Run
-
-```bash
-# Option A: Using Make (recommended)
-make deploy
-
-# Option B: Using Docker Compose directly
-docker-compose up -d --build
+**Issue: Docker Compose version warning**
 ```
-
-### 4️⃣ Access Services
-
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| 🏥 Dashboard | http://localhost | — |
-| 📊 Grafana | http://localhost:3000 | from `.env` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`) |
-| 📈 Prometheus | http://localhost:9090 | — |
-| 🔧 Flask API | http://localhost:5000 | — |
-
-### 5️⃣ Stop Services
-
-```bash
-make down
-# or
-docker-compose down
+Solution: The docker-compose.yml no longer uses the deprecated
+'version' attribute. Update to Docker Compose v2+
 ```
 
 > 📖 **Need more details?** See the full [Getting Started Guide](./docs/GETTING_STARTED.md).
