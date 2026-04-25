@@ -14,6 +14,7 @@ import json
 import logging
 import datetime
 import platform
+import secrets
 import psutil
 from flask import Flask, jsonify, request, render_template_string
 from prometheus_client import (
@@ -81,8 +82,8 @@ def get_db_connection():
             host=os.getenv("POSTGRES_HOST", "postgres"),
             port=int(os.getenv("POSTGRES_PORT", 5432)),
             dbname=os.getenv("POSTGRES_DB", "healthdb"),
-            user=os.getenv("POSTGRES_USER", "admin"),
-            password=os.getenv("POSTGRES_PASSWORD", "changeme"),
+            user=os.getenv("POSTGRES_USER", "health_admin"),
+            password=os.getenv("POSTGRES_PASSWORD", ""),
         )
         return conn
     except Exception as exc:
@@ -193,7 +194,7 @@ def collect_system_metrics():
 def create_app():
     """Application factory – creates and configures the Flask app."""
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or secrets.token_urlsafe(32)
 
     # Initialise database table on first request flag
     _db_initialized = {"done": False}

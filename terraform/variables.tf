@@ -20,3 +20,9 @@ variable "key_name" {
   type        = string
   default     = "my-devops-key"
 }
+
+variable "allowed_ssh_cidr" {
+  description = "CIDR block allowed to access SSH (22). Restrict to your static IP in production."
+  type        = string
+  default     = "0.0.0.0/0"
+}

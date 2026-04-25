@@ -24,14 +24,19 @@ htmlcov/
 
 # --- Environment ---
 .env
+.env.local
 !.env.example
 
 # --- Docker ---
 *.log
 docker-compose.override.yml
+security_report_python.json
+pip_audit_report.json
 
 # --- Terraform ---
 .terraform/
+terraform.tfstate
+terraform.tfstate.backup
 *.tfstate
 *.tfstate.backup
 *.tfplan
@@ -51,7 +56,12 @@ Thumbs.db
 *.bak
 *.tmp
 
-# SSH Keys
+# SSH / TLS keys and cert bundles
 my-devops-key.pem
 *.pem
+*.key
+*_rsa
+*_rsa.pub
+*.p12
+*.pfx
 server_ip.txt

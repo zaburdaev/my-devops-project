@@ -30,8 +30,8 @@ config:
   redisPort: "6379"
 
 secrets:
-  postgresUser: "admin"
-  postgresPassword: "changeme"
-  secretKey: "my-secret-key"
+  postgresUser: "CHANGE_ME_POSTGRES_USER"
+  postgresPassword: "CHANGE_ME_POSTGRES_PASSWORD"
+  secretKey: "CHANGE_ME_SECRET_KEY"
 
 namespace: health-dashboard
