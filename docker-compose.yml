@@ -19,16 +19,29 @@ services:
 
   app:
     build: .
+    image: health-dashboard-app
+    container_name: health-dashboard-app
+    ports:
+      - "5000:5000"
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: ${REDIS_URL}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://healthuser:healthpass@postgres:5432/healthdb}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      FLASK_ENV: production
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
     networks:
       - app-network
     restart: unless-stopped
     mem_limit: 256m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   nginx:
     image: nginx:alpine

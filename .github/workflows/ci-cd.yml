@@ -68,42 +68,46 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Navigate to project directory
             cd /opt/health-dashboard
 
-            # Pull latest changes
             echo "📥 Pulling latest changes..."
             git pull origin main
 
-            # Create .env file if it doesn't exist
             if [ ! -f .env ]; then
-              echo "📝 Creating .env file from template..."
+              echo "📝 Creating .env file..."
               cp .env.example .env
-              echo "✅ .env file created"
-            else
-              echo "✅ .env file already exists"
             fi
 
-            # Stop old containers
             echo "🛑 Stopping old containers..."
             docker compose down
 
-            # Pull latest images
-            echo "📦 Pulling latest images..."
-            docker compose pull
-
-            # Start new containers
             echo "🚀 Starting new containers..."
             docker compose up -d --build
 
-            # Wait for services to initialize
-            echo "⏳ Waiting for services to start..."
-            sleep 15
+            echo "⏳ Waiting 30 seconds for services to fully start..."
+            sleep 30
 
-            # Show running containers
-            echo "📊 Container status:"
+            echo ""
+            echo "📊 Container Status:"
             docker compose ps
 
-            # Verify application health
-            echo "🏥 Checking application health..."
-            curl -f http://localhost:5000/health || echo "⚠️  Health check failed"
+            echo ""
+            echo "🏥 Application Health Check:"
+            echo "=============================="
+
+            # Primary check via Nginx (production endpoint)
+            if curl -sf http://localhost/health > /dev/null 2>&1; then
+              echo "✅ Nginx endpoint: HEALTHY"
+              curl -s http://localhost/health | jq '.' || curl -s http://localhost/health
+            else
+              echo "❌ Nginx endpoint: FAILED"
+            fi
+
+            # Secondary check: direct Flask app endpoint
+            if curl -sf http://localhost:5000/health > /dev/null 2>&1; then
+              echo "✅ Flask direct: HEALTHY"
+            else
+              echo "⚠️  Flask direct: Not accessible (may need more time)"
+            fi
+
+            echo "=============================="
