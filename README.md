@@ -100,12 +100,7 @@ This project was created as a comprehensive DevOps course project (DevOpsUA6) to
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Docker and Docker Compose installed
-- Git installed
-
-### Local Deployment
+### Local Development
 
 1. **Clone the repository:**
    ```bash
@@ -118,52 +113,56 @@ This project was created as a comprehensive DevOps course project (DevOpsUA6) to
    cp .env.example .env
    ```
 
-   Edit `.env` if needed (default values work for local development).
-
-3. **Build and run:**
+3. **Start the application:**
    ```bash
    docker compose up --build
    ```
 
 4. **Access the application:**
-   - Application: http://localhost
-   - Health Check: http://localhost:5000/health
-   - Grafana: http://localhost:3000 (admin/admin)
-   - Prometheus: http://localhost:9090
-  
-5. Stop APP
-    - docker compose down -v
+   - **Main App (via Nginx):** http://localhost
+   - **Health Check:** http://localhost/health
+   - **Grafana:** http://localhost:3000 (admin/admin)
+   - **Prometheus:** http://localhost:9090
 
-### Common Issues
+### 🔧 Optional: Direct Flask Access (Port 5000)
 
-**Issue: `psutil` build fails**
-```
-Solution: The Dockerfile includes gcc and python3-dev dependencies.
-If you still face issues, ensure you're using the latest Dockerfile.
-```
+By default, Flask app is only accessible via Nginx (port 80).
 
-**Issue: Missing environment variables**
+If you want direct access to Flask on port 5000:
+
 ```bash
-Solution: Make sure you created the .env file:
-cp .env.example .env
+# Copy the override template
+cp docker-compose.override.yml.example docker-compose.override.yml
+
+# Restart containers
+docker compose down
+docker compose up -d
 ```
 
-**Issue: Docker Compose version warning**
-```
-Solution: The docker-compose.yml no longer uses the deprecated
-'version' attribute. Update to Docker Compose v2+
-```
+**Note:** This requires port 5000 to be free on your machine.
 
-**Issue: Cannot login to Grafana with admin/admin**
+### ⚠️ Port 5000 Already in Use?
+
+If you get error: `bind: address already in use`
+
+**Option 1:** Just use Nginx (recommended)
 ```bash
-Solution: remove old Grafana data volume and recreate containers:
-docker compose down -v
-docker compose up --build
-
-Then login with credentials from .env (default: admin/admin).
+# Access via http://localhost instead of http://localhost:5000
 ```
 
-> 📖 **Need more details?** See the full [Getting Started Guide](./docs/GETTING_STARTED.md).
+**Option 2:** Find and stop the process using port 5000
+```bash
+# On macOS/Linux
+lsof -ti:5000 | xargs kill -9
+
+# On Windows
+netstat -ano | findstr :5000
+taskkill /PID <PID> /F
+```
+
+**Option 3:** Don't use the override file (skip port 5000 exposure)
+
+> 📖 **Need more details?** See the full [Getting Started Guide](./docs/GETTING_STARTED.md) and [Port Conflict Fix](./docs/PORT_CONFLICT_FIX.md).
 
 ---
 

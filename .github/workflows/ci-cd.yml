@@ -95,19 +95,16 @@ jobs:
             echo "🏥 Application Health Check:"
             echo "=============================="
 
-            # Primary check via Nginx (production endpoint)
+            # Check via Nginx (main production endpoint)
             if curl -sf http://localhost/health > /dev/null 2>&1; then
-              echo "✅ Nginx endpoint: HEALTHY"
-              curl -s http://localhost/health | jq '.' || curl -s http://localhost/health
+              echo "✅ Application is HEALTHY (via Nginx)"
+              curl -s http://localhost/health | jq '.' 2>/dev/null || curl -s http://localhost/health
             else
-              echo "❌ Nginx endpoint: FAILED"
-            fi
-
-            # Secondary check: direct Flask app endpoint
-            if curl -sf http://localhost:5000/health > /dev/null 2>&1; then
-              echo "✅ Flask direct: HEALTHY"
-            else
-              echo "⚠️  Flask direct: Not accessible (may need more time)"
+              echo "❌ Application health check FAILED"
+              echo "Checking container logs..."
+              docker compose logs app --tail=20
+              exit 1
             fi
 
             echo "=============================="
+            echo "✅ Deployment successful!"

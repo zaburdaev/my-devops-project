@@ -1,0 +1,15 @@
+# docker-compose.override.yml.example
+#
+# This file is for LOCAL DEVELOPMENT ONLY
+# It exposes Flask port 5000 for direct access
+#
+# To use:
+#   cp docker-compose.override.yml.example docker-compose.override.yml
+#
+# WARNING: Only use this if port 5000 is available on your machine!
+# In production, access the app via Nginx (port 80)
+
+services:
+  app:
+    ports:
+      - "5000:5000"  # Direct access to Flask (optional for development)

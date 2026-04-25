@@ -43,8 +43,8 @@ docker compose ps
 ### Step 4: Verify Installation
 
 ```bash
-# Test application
-curl http://localhost:5000/health
+# Test application via Nginx
+curl http://localhost/health
 
 # Should return: {"status":"healthy"}
 ```
@@ -78,6 +78,60 @@ docker compose down -v
 docker compose up --build
 ```
 Then login using credentials from `.env` (default: `admin/admin`).
+
+---
+
+## Port Configuration
+
+### Default Ports
+
+The application uses the following ports:
+
+| Service | Port | Accessible From Host |
+|---------|------|---------------------|
+| Nginx | 80 | ✅ Yes |
+| Grafana | 3000 | ✅ Yes |
+| Prometheus | 9090 | ✅ Yes |
+| Flask App | 5000 | ❌ No (internal only) |
+| PostgreSQL | 5432 | ❌ No (internal only) |
+| Redis | 6379 | ❌ No (internal only) |
+
+### Why is Flask (5000) Not Exposed?
+
+**Security & Best Practices:**
+- In production, users should access the app via Nginx (reverse proxy)
+- Direct Flask access is not needed in production
+- Nginx provides caching, load balancing, and SSL termination
+
+**Local Development:**
+- Access the app via Nginx: `http://localhost`
+- Health check: `http://localhost/health`
+
+### Enable Direct Flask Access (Optional)
+
+For debugging or development, you can optionally expose port 5000:
+
+```bash
+cp docker-compose.override.yml.example docker-compose.override.yml
+docker compose down
+docker compose up -d
+```
+
+Now Flask is accessible at: `http://localhost:5000`
+
+### Troubleshooting Port Conflicts
+
+If port 80, 3000, or 9090 is already in use:
+
+```bash
+# Find process using the port (example: port 80)
+lsof -i :80
+
+# Stop Docker and free the port
+docker compose down
+
+# Identify and stop the conflicting process
+```
 
 ---
 
@@ -324,11 +378,12 @@ Once all services are running, open your web browser and visit:
 | Service | URL | What You'll See |
 |---------|-----|----------------|
 | 🏥 **Dashboard** | [http://localhost](http://localhost) | Main health monitoring page (via Nginx) |
-| 🔧 **Flask API** | [http://localhost:5000](http://localhost:5000) | Direct access to the Flask app |
-| 🔧 **Health Check** | [http://localhost:5000/health](http://localhost:5000/health) | JSON health status |
-| 🔧 **System Info** | [http://localhost:5000/api/system-info](http://localhost:5000/api/system-info) | Detailed system metrics (JSON) |
+| 🔧 **Health Check** | [http://localhost/health](http://localhost/health) | JSON health status |
+| 🔧 **System Info** | [http://localhost/api/system-info](http://localhost/api/system-info) | Detailed system metrics (JSON) |
 | 📈 **Prometheus** | [http://localhost:9090](http://localhost:9090) | Metrics query interface |
 | 📊 **Grafana** | [http://localhost:3000](http://localhost:3000) | Monitoring dashboards (credentials from `.env`) |
+
+> Optional direct Flask access (`http://localhost:5000`) is available only if you create `docker-compose.override.yml` from `docker-compose.override.yml.example`. 
 
 ### First Time in Grafana
 
