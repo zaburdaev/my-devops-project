@@ -123,6 +123,13 @@ This project was created as a comprehensive DevOps course project (DevOpsUA6) to
    - **Health Check:** http://localhost/health
    - **Grafana:** http://localhost:3000 (admin/admin)
    - **Prometheus:** http://localhost:9090
+  
+     
+5. If have GRAFANA login
+   # Restart containers
+docker compose down
+docker compose up -d
+and update password
 
 ### 🔧 Optional: Direct Flask Access (Port 5000)
 
