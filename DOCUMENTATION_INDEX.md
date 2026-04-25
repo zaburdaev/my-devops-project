@@ -22,6 +22,7 @@
 
 ## Technical / Operational Docs (RU)
 
+- `COMPLETE_GUIDE_FOR_NON_IT_RU.md` — максимально подробное руководство для не-IT специалиста
 - `docs/BEGINNER_GUIDE_RU.md`
 - `docs/DEMO_SCRIPT_RU.md`
 - `docs/AWS_DEPLOYMENT_RU.md`
