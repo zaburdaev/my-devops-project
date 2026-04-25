@@ -13,7 +13,7 @@
 > **AWS:** Deployed at `3.127.155.114` ✅  
 > **Description:** A full-stack DevOps project featuring a system health monitoring dashboard built with Flask, containerized with Docker, orchestrated with Kubernetes, provisioned with Terraform, configured with Ansible, and monitored with Prometheus + Grafana.
 
-🇷🇺 [Версия на русском](./README_RU.md)
+[Версия RU ](./README_RU.md)
 
 ---
 
@@ -260,7 +260,7 @@ This project includes comprehensive documentation for every aspect:
 | ✅ [Project Checklist](./docs/PROJECT_CHECKLIST.md) | Submission checklist (240 points) |
 | 🤝 [Contributing](./CONTRIBUTING.md) | How to contribute to this project |
 
-### 🇷🇺 Russian Documentation
+### Ru Documentation
 
 | Document | Description |
 |----------|-------------|
