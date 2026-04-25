@@ -69,6 +69,16 @@ docker compose down
 docker compose up --build
 ```
 
+#### Grafana login failed with admin/admin
+**Problem:** Old Grafana volume keeps previous credentials
+
+**Solution:**
+```bash
+docker compose down -v
+docker compose up --build
+```
+Then login using credentials from `.env` (default: `admin/admin`).
+
 ---
 
 ## 📋 Table of Contents

@@ -151,6 +151,15 @@ Solution: The docker-compose.yml no longer uses the deprecated
 'version' attribute. Update to Docker Compose v2+
 ```
 
+**Issue: Cannot login to Grafana with admin/admin**
+```bash
+Solution: remove old Grafana data volume and recreate containers:
+docker compose down -v
+docker compose up --build
+
+Then login with credentials from .env (default: admin/admin).
+```
+
 > 📖 **Need more details?** See the full [Getting Started Guide](./docs/GETTING_STARTED.md).
 
 ---
