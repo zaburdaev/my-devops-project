@@ -140,8 +140,8 @@ curl http://3.127.155.114:3000/api/health
 
 Проверки:
 1. `http://3.127.155.114:9090/targets` — `flask-app` должен быть UP.
-2. В Grafana есть datasource `Prometheus` и `Loki`.
-3. В контейнерах смонтирован каталог `./grafana/provisioning`.
+2. В Grafana есть datasource `Prometheus` (Loki удалён в оптимизированной конфигурации).
+3. В контейнерах смонтирован каталог `./monitoring/grafana/provisioning`.
 
 Команды на сервере:
 

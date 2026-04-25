@@ -53,14 +53,14 @@ cp .env.example .env
 #### Step 2: Build and Start
 
 ```bash
-# Build the Docker image and start all 7 services
+# Build the Docker image and start all 6 services
 docker-compose up -d --build
 ```
 
 > 💡 **What happens here?**
 > 1. Docker builds the Flask app image using the multi-stage `Dockerfile`
-> 2. Docker downloads images for PostgreSQL, Redis, Nginx, Prometheus, Grafana, Loki
-> 3. All 7 containers start and connect to the `app-network`
+> 2. Docker downloads images for PostgreSQL, Redis, Nginx, Prometheus, and Grafana
+> 3. All 6 containers start and connect to the `app-network`
 > 4. Health checks verify that services are running properly
 
 #### Step 3: Verify
@@ -81,7 +81,7 @@ curl http://localhost:5000/health
 | Service | URL |
 |---------|-----|
 | 🏥 Dashboard | http://localhost |
-| 📊 Grafana | http://localhost:3000 (admin/admin) |
+| 📊 Grafana | http://localhost:3000 (credentials from `.env`) |
 | 📈 Prometheus | http://localhost:9090 |
 | 🔧 Flask API | http://localhost:5000 |
 
@@ -181,10 +181,10 @@ After a few minutes, Terraform will output:
 ```
 Outputs:
 instance_id = "i-0abc123def456..."
-instance_public_ip = "3.120.xxx.xxx"
-app_url = "http://3.120.xxx.xxx"
-grafana_url = "http://3.120.xxx.xxx:3000"
-prometheus_url = "http://3.120.xxx.xxx:9090"
+instance_public_ip = "3.127.155.114"
+app_url = "http://3.127.155.114"
+grafana_url = "http://3.127.155.114:3000"
+prometheus_url = "http://3.127.155.114:9090"
 ```
 
 ### Step 6: Get the Server IP

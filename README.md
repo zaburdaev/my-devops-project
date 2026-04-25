@@ -11,7 +11,7 @@
 > **Course:** DevOpsUA6  
 > **Docker Hub:** [oskalibriya/health-dashboard](https://hub.docker.com/r/oskalibriya/health-dashboard)  
 > **AWS:** Deployed at `3.127.155.114` ✅  
-> **Description:** A full-stack DevOps project featuring a system health monitoring dashboard built with Flask, containerized with Docker, orchestrated with Kubernetes, provisioned with Terraform, configured with Ansible, and monitored with Prometheus + Grafana + Loki.
+> **Description:** A full-stack DevOps project featuring a system health monitoring dashboard built with Flask, containerized with Docker, orchestrated with Kubernetes, provisioned with Terraform, configured with Ansible, and monitored with Prometheus + Grafana.
 
 🇷🇺 [Версия на русском](./README_RU.md)
 
@@ -62,18 +62,18 @@ This project was created as a comprehensive DevOps course project (DevOpsUA6) to
 
 | Category | Technology | Purpose |
 |----------|-----------|--------|
-| 🐍 **Application** | Python 3.11 + Flask | Web application & REST API |
+| 🐍 **Application** | Python 3.11 + Flask 3.1.3 | Web application & REST API |
 | 🌐 **Web Server** | Gunicorn + Nginx | Production WSGI server & reverse proxy |
 | 🗄️ **Database** | PostgreSQL 15 | Persistent metrics storage |
 | ⚡ **Cache** | Redis 7 | Metrics caching (10s TTL) |
-| 🐳 **Containerization** | Docker + Docker Compose | Multi-service orchestration (7 services) |
+| 🐳 **Containerization** | Docker + Docker Compose | Multi-service orchestration (6 services) |
 | 🔄 **CI/CD** | GitHub Actions | Automated testing, building, deploying |
 | 🏗️ **IaC** | Terraform (AWS) | Infrastructure provisioning (EC2, SG) |
 | ⚙️ **Config Management** | Ansible | Server configuration & app deployment |
 | ☸️ **Orchestration** | Kubernetes + Helm | Container orchestration & scaling |
 | 📈 **Monitoring** | Prometheus | Metrics collection & alerting |
-| 📊 **Visualization** | Grafana | Dashboards & data visualization |
-| 📝 **Logging** | Loki | Log aggregation & querying |
+| 📊 **Visualization** | Grafana 10.4.7 | Dashboards & data visualization |
+| 📝 **Logging** | JSON logs (stdout) | Loki removed after optimization on t3.micro |
 
 ---
 
@@ -83,7 +83,7 @@ This project was created as a comprehensive DevOps course project (DevOpsUA6) to
 - ✅ **REST API** — JSON endpoints for system information and health checks
 - ✅ **Prometheus metrics** — `/metrics` endpoint for metric scraping
 - ✅ **Auto-provisioned Grafana** — Pre-built dashboards ready out of the box
-- ✅ **Structured JSON logging** — Loki-compatible log format
+- ✅ **Structured JSON logging** — exported to container stdout (Loki removed)
 - ✅ **Multi-stage Docker build** — Optimized, secure container images
 - ✅ **Non-root container** — Runs as `appuser` for security
 - ✅ **Health checks** — Docker and Kubernetes readiness/liveness probes
@@ -138,7 +138,7 @@ docker-compose up -d --build
 | Service | URL | Credentials |
 |---------|-----|-------------|
 | 🏥 Dashboard | http://localhost | — |
-| 📊 Grafana | http://localhost:3000 | admin / admin |
+| 📊 Grafana | http://localhost:3000 | from `.env` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`) |
 | 📈 Prometheus | http://localhost:9090 | — |
 | 🔧 Flask API | http://localhost:5000 | — |
 
@@ -170,12 +170,11 @@ my-devops-project/
 │   └── nginx.conf                #    Proxy configuration
 ├── monitoring/                   # 📊 Monitoring stack configuration
 │   ├── prometheus.yml            #    Prometheus scrape config
-│   ├── alert_rules.yml           #    Alerting rules (CPU, Memory, Downtime)
-│   └── loki-config.yaml          #    Loki log aggregation config
+│   └── alert_rules.yml           #    Alerting rules (CPU, Memory, Downtime)
 ├── grafana/                      # 📉 Grafana provisioning (auto-load)
 │   └── provisioning/
 │       ├── datasources/
-│       │   └── datasources.yml   #    Prometheus + Loki datasources
+│       │   └── datasources.yml   #    Prometheus datasource
 │       └── dashboards/
 │           ├── dashboards.yml    #    Dashboard provider config
 │           └── health-dashboard.json
@@ -209,7 +208,7 @@ my-devops-project/
 │   ├── TESTING.md                #    Testing guide
 │   └── PROJECT_CHECKLIST.md      #    Project submission checklist
 ├── Dockerfile                    # 🐳 Multi-stage Docker build
-├── docker-compose.yml            # 🐳 Full stack (7 services)
+├── docker-compose.yml            # 🐳 Full stack (6 services)
 ├── Makefile                      # 🔧 Automation shortcuts
 ├── requirements.txt              # 📦 Python dependencies
 ├── .env.example                  # 🔐 Environment variable template
@@ -239,11 +238,6 @@ my-devops-project/
                                                            ┌──────▼──────┐
                                                            │   Grafana   │
                                                            │ (port 3000) │
-                                                           └──────┬──────┘
-                                                                  │
-                                                           ┌──────▼──────┐
-                                                           │    Loki     │
-                                                           │ (port 3100) │
                                                            └─────────────┘
 ```
 
@@ -261,7 +255,7 @@ This project includes comprehensive documentation for every aspect:
 | 🏗️ [Architecture](./docs/ARCHITECTURE.md) | System design & component overview |
 | 🚀 [Deployment](./docs/DEPLOYMENT.md) | All deployment options (Docker, AWS, K8s, Ansible) |
 | 🔄 [CI/CD](./docs/CI_CD.md) | GitHub Actions pipeline explanation |
-| 📊 [Monitoring](./docs/MONITORING.md) | Prometheus, Grafana & Loki guide |
+| 📊 [Monitoring](./docs/MONITORING.md) | Prometheus & Grafana guide (Loki removed) |
 | 🧪 [Testing](./docs/TESTING.md) | Testing strategy & how to run tests |
 | ✅ [Project Checklist](./docs/PROJECT_CHECKLIST.md) | Submission checklist (240 points) |
 | 🤝 [Contributing](./CONTRIBUTING.md) | How to contribute to this project |
@@ -277,6 +271,14 @@ This project includes comprehensive documentation for every aspect:
 | 🚀 [Deployment Summary](./DEPLOYMENT_SUMMARY.md) | Deployed infrastructure summary |
 | 🔒 [Security Audit](./SECURITY_AUDIT.md) | Security audit results |
 | 📋 [Documentation Status](./DOCUMENTATION_STATUS.md) | Full documentation status report |
+
+---
+
+## 📊 Presentations
+
+Project presentations are available in PDF format:
+- [English Version](presentations/DevOps_Project_Presentation_EN.pdf)
+- [Russian Version](presentations/DevOps_Project_Presentation_RU.pdf)
 
 ---
 
@@ -356,9 +358,9 @@ Workflow file: [`.github/workflows/infrastructure-recovery.yml`](./.github/workf
 
 The project includes a full monitoring stack:
 
-- **Prometheus** (`:9090`) — Collects metrics from `/metrics` every 10 seconds
-- **Grafana** (`:3000`) — Pre-configured dashboard with CPU, memory, disk charts
-- **Loki** (`:3100`) — Aggregates structured JSON logs from the Flask app
+- **Prometheus** (`:9090`) — Collects metrics from `/metrics` every 60 seconds
+- **Grafana** (`:3000`, version 10.4.7) — Pre-configured dashboard with CPU, memory, disk charts
+- **Structured logs** — available via container stdout (`docker compose logs`), Loki removed
 - **Alert Rules** — CPU > 80%, Memory > 85%, App down alerts
 
 > 📖 See [docs/MONITORING.md](./docs/MONITORING.md) for the full monitoring guide.

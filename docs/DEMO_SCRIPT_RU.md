@@ -47,7 +47,7 @@ curl http://localhost:5000/health
 **Что говорить:**
 > «Мой проект — это Health Dashboard, полноценная DevOps-инфраструктура для веб-приложения мониторинга системных ресурсов. Проект демонстрирует полный цикл DevOps: от написания кода до автоматического деплоя и мониторинга.»
 
-> «В проекте использованы: Docker, Docker Compose, Flask, PostgreSQL, Redis, Nginx, Terraform, Kubernetes, Ansible, GitHub Actions, Prometheus, Grafana и Loki.»
+> «В проекте использованы: Docker, Docker Compose, Flask 3.1.3, PostgreSQL 15, Redis 7, Nginx, Terraform, Kubernetes, Ansible, GitHub Actions, Prometheus и Grafana 10.4.7. Loki был удалён в оптимизированной конфигурации.»
 
 **Что показать:**
 - Покажи README.md на GitHub
@@ -64,7 +64,7 @@ curl http://localhost:5000/health
 - `terraform/` → «Infrastructure as Code — описание AWS-инфраструктуры»
 - `k8s/` → «Kubernetes-манифесты для production-деплоя»
 - `ansible/` → «Автоматизация настройки серверов»
-- `monitoring/` → «Конфигурация мониторинга: Prometheus, Grafana, Loki»
+- `monitoring/` → «Конфигурация мониторинга: Prometheus и alert rules (Loki удалён)»
 - `.github/workflows/` → «CI/CD пайплайн»
 - `tests/` → «Юнит-тесты»
 
@@ -105,16 +105,16 @@ docker-compose ps
 ```
 
 **Что говорить:**
-> «Приложение работает в 7 Docker-контейнерах, управляемых через Docker Compose.»
+> «Приложение работает в 6 Docker-контейнерах, управляемых через Docker Compose.»
 
 Покажи каждый контейнер и объясни:
 - `app` → «Flask-приложение на Gunicorn»
 - `postgres` → «Реляционная база данных для хранения метрик»
 - `redis` → «Кэш для ускорения ответов API»
 - `nginx` → «Reverse proxy — входная точка для HTTP-запросов»
-- `prometheus` → «Сбор метрик каждые 10 секунд»
-- `grafana` → «Визуализация метрик и логов»
-- `loki` → «Агрегация логов»
+- `prometheus` → «Сбор метрик каждые 60 секунд»
+- `grafana` → «Визуализация метрик»
+- `app logs` → «JSON-логи доступны через docker compose logs (Loki удалён)»
 
 **Покажи Dockerfile:**
 > «Используется multi-stage build для уменьшения размера образа. Приложение запускается от непривилегированного пользователя — это best practice безопасности.»
@@ -140,7 +140,7 @@ docker images | grep health-dashboard
    > «REST API, который возвращает подробную информацию о системе в формате JSON.»
 
 4. **Metrics endpoint** — http://localhost:5000/metrics
-   > «Этот endpoint возвращает метрики в формате Prometheus. Prometheus их парсит каждые 10 секунд.»
+   > «Этот endpoint возвращает метрики в формате Prometheus. В текущей конфигурации Prometheus парсит их каждые 60 секунд.»
 
 ---
 
@@ -148,7 +148,7 @@ docker images | grep health-dashboard
 
 **Что показать:**
 
-1. Открой http://localhost:3000 (admin/admin)
+1. Открой http://localhost:3000 (логин/пароль из `.env`)
 2. Перейди в **Dashboards → Health Dashboard**
 
 **Что говорить:**
@@ -170,18 +170,14 @@ docker images | grep health-dashboard
 
 ### Шаг 7: Логи (1-2 мин)
 
-**В Grafana:**
-1. Перейди в **Explore** (иконка компаса слева)
-2. Выбери **Loki** как data source
-3. Введи запрос: `{container="app"}`
+**В терминале (текущий подход):**
+```bash
+docker compose logs --tail=20 app
+docker compose logs -f app
+```
 
 **Что говорить:**
-> «Логи собираются в формате JSON через Loki. Их можно фильтровать и искать прямо в Grafana.»
-
-**Или в терминале:**
-```bash
-docker-compose logs --tail=20 app
-```
+> «В оптимизированной версии Loki удалён, поэтому логи читаем напрямую из контейнера. Формат логов JSON, это удобно для последующей интеграции с внешним лог-стеком при необходимости.»
 
 ---
 

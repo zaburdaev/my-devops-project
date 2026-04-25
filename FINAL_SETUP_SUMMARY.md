@@ -25,7 +25,7 @@
 
 Verified after redeploy:
 - Grafana is healthy (`/api/health` OK).
-- Data sources auto-provisioned: **Prometheus** and **Loki**.
+- Data source auto-provisioned: **Prometheus** (Loki removed).
 - Dashboards present in Grafana search (including **Health Dashboard**).
 
 ## What Was Fixed

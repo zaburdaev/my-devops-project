@@ -11,7 +11,7 @@
 > **Курс:** DevOpsUA6  
 > **Docker Hub:** [oskalibriya/health-dashboard](https://hub.docker.com/r/oskalibriya/health-dashboard)  
 > **AWS:** Развёрнут на `3.127.155.114`  
-> **Описание:** Полноценный DevOps-проект: дашборд мониторинга системного здоровья на Flask, контейнеризация Docker, оркестрация Kubernetes, инфраструктура Terraform, конфигурация Ansible, мониторинг Prometheus + Grafana + Loki.
+> **Описание:** Полноценный DevOps-проект: дашборд мониторинга системного здоровья на Flask, контейнеризация Docker, оркестрация Kubernetes, инфраструктура Terraform, конфигурация Ansible, мониторинг Prometheus + Grafana (Loki удалён после оптимизации).
 
 🌍 [English version](./README.md)
 
@@ -60,13 +60,13 @@
 
 | Категория | Технология | Назначение |
 |-----------|-----------|------------|
-| 🐍 **Backend** | Flask (Python 3.11) | REST API и веб-интерфейс |
-| 🐳 **Контейнеризация** | Docker & Docker Compose | Контейнеризация и оркестрация |
+| 🐍 **Backend** | Flask 3.1.3 (Python 3.11) | REST API и веб-интерфейс |
+| 🐳 **Контейнеризация** | Docker & Docker Compose | Контейнеризация и оркестрация (6 сервисов) |
 | 🗄️ **База данных** | PostgreSQL 15 | Хранение метрик |
 | ⚡ **Кэширование** | Redis 7 | Кэширование данных |
 | 🌐 **Веб-сервер** | Nginx | Обратный прокси |
-| 📊 **Мониторинг** | Prometheus + Grafana | Метрики и визуализация |
-| 📝 **Логирование** | Loki | Агрегация структурированных логов |
+| 📊 **Мониторинг** | Prometheus + Grafana 10.4.7 | Метрики и визуализация |
+| 📝 **Логирование** | JSON-логи в stdout | Loki удалён после оптимизации |
 | 🔄 **CI/CD** | GitHub Actions | Автоматическое тестирование, сборка, деплой |
 | 🏗️ **IaC** | Terraform (AWS) | Провижининг инфраструктуры (EC2, SG) |
 | ⚙️ **Конфигурация** | Ansible | Настройка сервера и деплой |
@@ -82,7 +82,7 @@
 - ✅ **Infrastructure as Code** — Terraform провижинит AWS-ресурсы
 - ✅ **Ansible** — автоматическая настройка сервера
 - ✅ **Kubernetes** — манифесты + Helm chart для K8s деплоя
-- ✅ **Мониторинг** — Prometheus + Grafana + Loki
+- ✅ **Мониторинг** — Prometheus + Grafana (Loki удалён в оптимизированной конфигурации)
 - ✅ **Тесты** — 12 unit-тестов + линтинг
 - ✅ **Безопасность** — non-root контейнер, секреты, заголовки безопасности
 - ✅ **AWS деплой** — развёрнут на EC2 (3.127.155.114)
@@ -114,7 +114,7 @@ docker-compose up -d --build
 
 # 4. Открыть в браузере
 # Дашборд:  http://localhost
-# Grafana:  http://localhost:3000 (admin/admin)
+# Grafana:  http://localhost:3000 (логин/пароль из `.env`: `GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`)
 # Prometheus: http://localhost:9090
 ```
 
@@ -130,7 +130,7 @@ docker-compose up -d --build
 | 🏗️ [Architecture](./docs/ARCHITECTURE.md) | Архитектура системы |
 | 🚀 [Deployment](./docs/DEPLOYMENT.md) | Все варианты деплоя (Docker, AWS, K8s, Ansible) |
 | 🔄 [CI/CD](./docs/CI_CD.md) | Описание CI/CD пайплайна |
-| 📊 [Monitoring](./docs/MONITORING.md) | Мониторинг: Prometheus, Grafana, Loki |
+| 📊 [Monitoring](./docs/MONITORING.md) | Мониторинг: Prometheus + Grafana (Loki удалён) |
 | 🧪 [Testing](./docs/TESTING.md) | Стратегия тестирования |
 | ✅ [Project Checklist](./docs/PROJECT_CHECKLIST.md) | Чеклист проекта (240 баллов) |
 
@@ -148,6 +148,14 @@ docker-compose up -d --build
 
 ---
 
+## 📊 Презентации
+
+PDF-презентации проекта:
+- [English Version](presentations/DevOps_Project_Presentation_EN.pdf)
+- [Russian Version](presentations/DevOps_Project_Presentation_RU.pdf)
+
+---
+
 ## 🔌 API-эндпоинты
 
 | Метод | Эндпоинт | Описание |
@@ -161,9 +169,9 @@ docker-compose up -d --build
 
 ## 📊 Мониторинг
 
-- **Prometheus** (`:9090`) — сбор метрик каждые 10 секунд
-- **Grafana** (`:3000`) — предустановленный дашборд (CPU, память, диск)
-- **Loki** (`:3100`) — структурированные JSON-логи
+- **Prometheus** (`:9090`) — сбор метрик каждые 60 секунд
+- **Grafana** (`:3000`, версия 10.4.7) — предустановленный дашборд (CPU, память, диск)
+- **JSON-логи** — доступны через `docker compose logs` (Loki удалён)
 - **Алерты** — CPU > 80%, память > 85%, приложение недоступно
 
 ---

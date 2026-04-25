@@ -2,7 +2,7 @@
 
 ## 🎯 Project Status: FULLY OPERATIONAL
 
-**Date:** April 24, 2026  
+**Date:** April 25, 2026  
 **Student:** Vitalii Zaburdaiev  
 **Course:** DevOpsUA6  
 **Repository:** https://github.com/zaburdaev/my-devops-project
@@ -20,7 +20,7 @@ This IP never changes, even if the server is recreated!
 |---------|-----|--------|-------------|
 | Flask Application | http://3.127.155.114:5000 | ✅ Running | - |
 | Health Check | http://3.127.155.114:5000/health | ✅ Healthy | - |
-| Grafana | http://3.127.155.114:3000 | ✅ Fast & Responsive | admin / admin |
+| Grafana | http://3.127.155.114:3000 | ✅ Fast & Responsive | from `.env` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`) |
 | Prometheus | http://3.127.155.114:9090 | ✅ Collecting Metrics | - |
 | Nginx | http://3.127.155.114 | ✅ Running | - |
 

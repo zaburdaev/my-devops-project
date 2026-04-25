@@ -5,7 +5,7 @@
 
 ## Что упрощено
 1. **Prometheus retention** уменьшен до `6h` (вместо долгого хранения), чтобы снизить RAM/диск.
-2. **Скрейп и evaluation** увеличены до `30s`, чтобы снизить нагрузку.
+2. **Скрейп и evaluation** увеличены до `60s`, чтобы снизить нагрузку.
 3. **Grafana dashboard** упрощён:
    - убраны проблемные панели `gauge`/`timeseries`;
    - используются базовые `stat` и `graph` панели;
@@ -13,7 +13,7 @@
 4. Добавлены лимиты памяти контейнеров:
    - Prometheus: `256m` (reservation `128m`)
    - Grafana: `256m` (reservation `128m`)
-   - Loki: `128m` (reservation `64m`)
+   - Loki удалён из compose-стека
 
 ## Важный фикс
 Исправлен путь монтирования Grafana provisioning и dashboards в `docker-compose.yml`:
@@ -30,7 +30,7 @@ sudo docker compose up -d postgres redis
 sleep 10
 sudo docker compose up -d app
 sleep 10
-sudo docker compose up -d prometheus loki grafana
+sudo docker compose up -d prometheus grafana
 sleep 10
 sudo docker compose up -d nginx
 ```
@@ -57,5 +57,5 @@ curl -u admin:admin http://localhost:3000/api/datasources
 
 ## Trade-offs
 - Меньше история в Prometheus (только последние 6 часов).
-- Реже обновление метрик (каждые 30 секунд).
+- Реже обновление метрик (каждые 60 секунд).
 - Дашборд проще, но надёжнее для демо на малом инстансе.

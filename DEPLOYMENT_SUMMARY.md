@@ -48,10 +48,10 @@ The workflow will:
 ## 📊 Grafana Auto-Provisioning
 
 Provisioning source (mounted in Compose):
-- `./grafana/provisioning:/etc/grafana/provisioning`
+- `./monitoring/grafana/provisioning:/etc/grafana/provisioning`
 
 Verified outcome:
-- Data sources created automatically: **Prometheus**, **Loki**
+- Data source created automatically: **Prometheus** (Loki removed)
 - Dashboards auto-loaded from provisioning files
 
 ## 🧪 Verification

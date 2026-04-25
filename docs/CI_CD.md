@@ -130,11 +130,11 @@ steps:
   2. Connects to the server via SSH
   3. Creates /opt/health-dashboard directory if it doesn't exist
   4. On first deploy: clones the repository from GitHub
-  5. On subsequent deploys: pulls the latest changes via git pull
-  6. Creates .env file from .env.example if it doesn't exist
-  7. Pulls the latest Docker images
-  8. Restarts Docker Compose services
-  9. Shows service status
+  5. On subsequent deploys: syncs to `origin/main` with `git fetch` + `reset --hard`
+  6. Creates `.env` from `.env.example` only if missing
+  7. Starts services in stages (DB/cache → app → monitoring/reverse proxy)
+  8. Uses `docker compose` commands for deployment
+  9. Shows service status and health checks
 ```
 
 **Why this matters:** Automatically deploys new code to the server without manual intervention. The deployment script handles both initial (first-time) and subsequent deployments automatically — no need to manually set up the server directory beforehand.
@@ -214,12 +214,18 @@ jobs:
               cd /opt && sudo git clone <repo-url> health-dashboard
               sudo chown -R $(whoami):$(whoami) /opt/health-dashboard
             else
-              cd /opt/health-dashboard && git pull origin main
+              cd /opt/health-dashboard
+              sudo git fetch origin main
+              sudo git reset --hard origin/main
+              sudo git clean -fd
             fi
             cd /opt/health-dashboard
             [ ! -f ".env" ] && cp .env.example .env
-            docker-compose pull
-            docker-compose up -d
+            docker compose up -d postgres redis
+            sleep 8
+            docker compose up -d app
+            sleep 8
+            docker compose up -d prometheus grafana nginx
 ```
 
 ---
@@ -399,7 +405,7 @@ sudo git clone https://github.com/zaburdaev/my-devops-project.git health-dashboa
 sudo chown -R ec2-user:ec2-user /opt/health-dashboard
 cd /opt/health-dashboard
 cp .env.example .env
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 **Alternative:** Run Ansible playbook first to prepare the server:

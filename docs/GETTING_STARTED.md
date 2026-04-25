@@ -26,12 +26,12 @@ Before you begin, you need to install these tools on your computer:
 |------|---------|----------------|
 | **Git** | 2.30+ | To download (clone) the project code from GitHub |
 | **Docker** | 20.0+ | To run the application and all its services in containers |
-| **Docker Compose** | 2.0+ | To start all 7 services at once with a single command |
+| **Docker Compose** | 2.0+ | To start all 6 services at once with a single command |
 | **Python** | 3.11+ | *(Optional)* Only needed if you want to run tests locally without Docker |
 
 > 💡 **What is Docker?** Docker is a tool that packages applications and their dependencies into "containers" — lightweight, portable environments that run the same everywhere. Think of it like a shipping container for software.
 
-> 💡 **What is Docker Compose?** Docker Compose lets you define and run multiple Docker containers together. Our project has 7 services, and Docker Compose starts them all with one command.
+> 💡 **What is Docker Compose?** Docker Compose lets you define and run multiple Docker containers together. Our project currently has 6 services, and Docker Compose starts them all with one command.
 
 ---
 
@@ -130,7 +130,7 @@ my-devops-project/
 ├── app/              # The Flask application
 ├── tests/            # Unit tests
 ├── nginx/            # Nginx configuration
-├── monitoring/       # Prometheus, Grafana, Loki configs
+├── monitoring/       # Prometheus and alerting configs (Loki removed)
 ├── terraform/        # AWS infrastructure code
 ├── ansible/          # Server automation
 ├── k8s/              # Kubernetes manifests
@@ -189,7 +189,7 @@ GF_SECURITY_ADMIN_PASSWORD=admin # Grafana login password
 
 Now let's start all services! This single command will:
 - Build the Flask application Docker image
-- Start all 7 services (app, PostgreSQL, Redis, Nginx, Prometheus, Grafana, Loki)
+- Start all 6 services (app, PostgreSQL, Redis, Nginx, Prometheus, Grafana)
 - Create a network so services can communicate with each other
 - Set up persistent data volumes
 
@@ -226,7 +226,7 @@ make ps
 docker-compose ps
 ```
 
-You should see all 7 services with status "Up" or "healthy":
+You should see all 6 services with status "Up" or "healthy":
 
 ```
 NAME                STATUS
@@ -236,7 +236,6 @@ redis               Up (healthy)
 nginx               Up
 prometheus          Up
 grafana             Up
-loki                Up
 ```
 
 ---
@@ -252,15 +251,14 @@ Once all services are running, open your web browser and visit:
 | 🔧 **Health Check** | [http://localhost:5000/health](http://localhost:5000/health) | JSON health status |
 | 🔧 **System Info** | [http://localhost:5000/api/system-info](http://localhost:5000/api/system-info) | Detailed system metrics (JSON) |
 | 📈 **Prometheus** | [http://localhost:9090](http://localhost:9090) | Metrics query interface |
-| 📊 **Grafana** | [http://localhost:3000](http://localhost:3000) | Monitoring dashboards (login: admin/admin) |
+| 📊 **Grafana** | [http://localhost:3000](http://localhost:3000) | Monitoring dashboards (credentials from `.env`) |
 
 ### First Time in Grafana
 
 1. Open [http://localhost:3000](http://localhost:3000)
-2. Login with **admin** / **admin**
-3. When prompted to change password, you can skip or set a new one
-4. Go to **Dashboards** → **Browse** → **Health Dashboard**
-5. You should see live CPU, memory, and disk usage charts! 📊
+2. Login using credentials from your `.env` file (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`)
+3. Go to **Dashboards** → **Browse** → **Health Dashboard**
+4. You should see live CPU, memory, and disk usage charts! 📊
 
 ---
 
@@ -428,7 +426,7 @@ pip install -r requirements.txt
 **Solution:**
 1. Wait 30-60 seconds for Prometheus to collect data
 2. Check Prometheus targets: [http://localhost:9090/targets](http://localhost:9090/targets) — all targets should be "UP"
-3. Grafana datasources should be auto-configured — if not, check `grafana/provisioning/`
+3. Grafana datasources should be auto-configured — if not, check `monitoring/grafana/provisioning/`
 
 ---
 

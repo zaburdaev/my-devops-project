@@ -42,8 +42,8 @@ This checklist helps you verify that the **Health Monitoring Dashboard** project
 | Criterion | File/Location | What to Look For |
 |-----------|--------------|-----------------|
 | Dockerfile exists | `Dockerfile` | Multi-stage build, non-root user |
-| Docker Compose config | `docker-compose.yml` | 7 services defined |
-| Multiple services | `docker-compose.yml` | app, postgres, redis, nginx, prometheus, grafana, loki |
+| Docker Compose config | `docker-compose.yml` | 6 services defined |
+| Multiple services | `docker-compose.yml` | app, postgres, redis, nginx, prometheus, grafana |
 | Health checks | `docker-compose.yml` | `healthcheck` sections for app, postgres, redis |
 | Volumes for persistence | `docker-compose.yml` | `postgres_data`, `redis_data`, `grafana_data` volumes |
 | Network configuration | `docker-compose.yml` | `app-network` bridge network |
@@ -55,7 +55,7 @@ This checklist helps you verify that the **Health Monitoring Dashboard** project
 # Show running containers
 docker-compose ps
 
-# Show all 7 services are healthy
+# Show all 6 services are healthy
 docker-compose up -d --build
 curl http://localhost:5000/health
 ```
@@ -146,14 +146,14 @@ ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
 |-----------|--------------|-----------------|
 | Prometheus config | `monitoring/prometheus.yml` | Scrape targets configured |
 | Alert rules | `monitoring/alert_rules.yml` | CPU, memory, downtime alerts |
-| Grafana datasources | `grafana/provisioning/datasources/` | Prometheus + Loki auto-configured |
-| Grafana dashboard | `grafana/provisioning/dashboards/health-dashboard.json` | 5 panels |
-| Dashboard provisioning | `grafana/provisioning/dashboards/` | Auto-load config |
-| Loki configuration | `monitoring/loki-config.yaml` | Log aggregation setup |
+| Grafana datasources | `monitoring/grafana/provisioning/datasources/` | Prometheus auto-configured |
+| Grafana dashboard | `monitoring/grafana/dashboards/health-dashboard.json` | 5 panels |
+| Dashboard provisioning | `monitoring/grafana/provisioning/dashboards/` | Auto-load config |
+| Logging note | `docs/MINIMAL_SETUP_RU.md` | Loki removed in optimized stack |
 | App exposes metrics | `app/app.py` | `/metrics` endpoint |
 
 **How to demonstrate:**
-1. Open Grafana at http://localhost:3000 (admin/admin)
+1. Open Grafana at http://localhost:3000 (use credentials from `.env`)
 2. Show the Health Dashboard with live metrics
 3. Open Prometheus at http://localhost:9090 → Status → Targets (all UP)
 4. Show `/metrics` endpoint: `curl http://localhost:5000/metrics`
@@ -205,7 +205,7 @@ Run through this checklist before submitting:
 - [ ] All files are committed to Git
 - [ ] `.env.example` exists (but NOT `.env`)
 - [ ] `Dockerfile` builds successfully
-- [ ] `docker-compose.yml` starts all 7 services
+- [ ] `docker-compose.yml` starts all 6 services
 - [ ] All 12 tests pass (`pytest tests/ -v`)
 - [ ] Flake8 linting passes (`make lint`)
 

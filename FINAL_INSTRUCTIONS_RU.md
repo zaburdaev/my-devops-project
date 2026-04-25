@@ -10,8 +10,8 @@
 
 **Grafana (быстрая и с данными):**
 - Открой: http://3.127.155.114:3000
-- Войди: admin / admin
-- Открой Dashboard → "Health Monitor (Simple)"
+- Войди под учётными данными из `.env` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`)
+- Открой Dashboard → "Health Dashboard"
 - Должны быть зелёные панели со значением "1"
 
 **Prometheus:**
