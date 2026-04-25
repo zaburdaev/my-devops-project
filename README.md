@@ -126,10 +126,13 @@ This project was created as a comprehensive DevOps course project (DevOpsUA6) to
    ```
 
 4. **Access the application:**
-   - Application: http://localhost:5000
+   - Application: http://localhost
    - Health Check: http://localhost:5000/health
    - Grafana: http://localhost:3000 (admin/admin)
    - Prometheus: http://localhost:9090
+  
+5. Stop APP
+    - docker compose down -v
 
 ### Common Issues
 
