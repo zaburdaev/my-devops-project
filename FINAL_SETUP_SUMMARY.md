@@ -10,7 +10,7 @@
 ## Service URLs
 
 - **Main Dashboard (Nginx):** http://3.127.155.114
-- **App Health (Flask):** http://3.127.155.114:5000/health
+- **App Health (Flask):** http://3.127.155.114/health
 - **Grafana:** http://3.127.155.114:3000
 - **Prometheus:** http://3.127.155.114:9090
 
