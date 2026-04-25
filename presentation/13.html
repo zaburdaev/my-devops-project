@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>Безопасность и качество</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Merriweather&display=swap');
+.font-lato { font-family: 'Lato', 'Corbel', sans-serif; }
+.font-merriweather { font-family: 'Merriweather', 'Constantia', serif; }
+</style>
+</head>
+<body class="m-0 p-0">
+<div class="relative overflow-hidden w-[1920px] h-[1080px] bg-[#0D1117] flex flex-col">
+
+  <div class="flex-none flex flex-row items-center gap-6 px-16 py-8">
+    <div class="bg-[#58A6FF]" style="width:6px; height:50px; border-radius:3px;"></div>
+    <i data-lucide="shield-check" class="w-12 h-12 text-[#58A6FF]"></i>
+    <h1 class="text-6xl font-bold font-lato text-[#E6EDF3] leading-tight">Безопасность и качество (финальная версия)</h1>
+  </div>
+
+  <div class="flex-1 min-h-0 grid grid-cols-[2fr_3fr] gap-8 px-16 pb-4">
+    <div class="flex flex-col gap-5">
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6">
+        <p class="text-4xl font-bold text-[#58A6FF] font-lato mb-2">Секреты и конфигурация</p>
+        <ul class="text-3xl text-[#8B949E] font-merriweather list-disc pl-8 space-y-2">
+          <li>SECRET_KEY генерируется безопасно, если не задан env.</li>
+          <li>Удалены слабые дефолтные креды из .env.example, K8s и Helm values.</li>
+          <li>Grafana параметры вынесены в переменные окружения.</li>
+        </ul>
+      </div>
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6">
+        <p class="text-4xl font-bold text-[#58A6FF] font-lato mb-2">Код и зависимости</p>
+        <ul class="text-3xl text-[#8B949E] font-merriweather list-disc pl-8 space-y-2">
+          <li>Обновлены уязвимые Python зависимости.</li>
+          <li>12 unit-тестов стабильно проходят в CI.</li>
+          <li>Nginx и Docker конфигурации усилены для production-сценария.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-5">
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-col gap-3">
+        <i data-lucide="file-lock-2" class="w-10 h-10 text-[#3FB950]"></i>
+        <p class="text-3xl font-bold text-[#E6EDF3] font-lato">.gitignore hardening</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">Исключены state-файлы, ключи, отчёты аудита и локальные env.</p>
+      </div>
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-col gap-3">
+        <i data-lucide="lock-keyhole" class="w-10 h-10 text-[#3FB950]"></i>
+        <p class="text-3xl font-bold text-[#E6EDF3] font-lato">Terraform security</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">SSH CIDR вынесен в переменную: удобно и безопасно ограничивать доступ.</p>
+      </div>
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-col gap-3">
+        <i data-lucide="clipboard-check" class="w-10 h-10 text-[#3FB950]"></i>
+        <p class="text-3xl font-bold text-[#E6EDF3] font-lato">SECURITY_AUDIT.md</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">Зафиксировано отсутствие реальных credentials в репозитории.</p>
+      </div>
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-col gap-3">
+        <i data-lucide="book-open-check" class="w-10 h-10 text-[#3FB950]"></i>
+        <p class="text-3xl font-bold text-[#E6EDF3] font-lato">Документация</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">Обновлены README, CI/CD guide, troubleshooting и recovery разделы.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-none flex flex-row items-center justify-between px-16 py-4 border-t border-[#30363D]">
+    <p class="text-3xl text-[#6E7681] font-lato">DevOpsUA6</p>
+    <p class="text-3xl text-[#6E7681] font-lato">Vitalii Zaburdaiev</p>
+    <p class="text-3xl text-[#6E7681] font-lato">github.com/zaburdaev/my-devops-project</p>
+  </div>
+
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

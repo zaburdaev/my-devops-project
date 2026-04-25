@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>Устойчивость и recovery</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Merriweather&display=swap');
+.font-lato { font-family: 'Lato', 'Corbel', sans-serif; }
+.font-merriweather { font-family: 'Merriweather', 'Constantia', serif; }
+</style>
+</head>
+<body class="m-0 p-0">
+<div class="relative overflow-hidden w-[1920px] h-[1080px] bg-[#0D1117] flex flex-col">
+
+  <div class="flex-none flex flex-row items-center gap-6 px-16 py-8">
+    <div class="bg-[#58A6FF]" style="width:6px; height:50px; border-radius:3px;"></div>
+    <i data-lucide="life-buoy" class="w-12 h-12 text-[#58A6FF]"></i>
+    <h1 class="text-6xl font-bold font-lato text-[#E6EDF3] leading-tight">Устойчивость инфраструктуры и Recovery</h1>
+  </div>
+
+  <div class="flex-1 min-h-0 grid grid-cols-[3fr_2fr] gap-8 px-16 pb-4">
+    <div class="flex flex-col gap-5">
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6">
+        <p class="text-4xl font-bold text-[#58A6FF] font-lato mb-2">Что добавлено в финальной версии</p>
+        <ul class="text-3xl text-[#8B949E] font-merriweather list-disc pl-8 space-y-2">
+          <li>Static Elastic IP для стабильного публичного доступа.</li>
+          <li>Recovery runbook в AWS_DEPLOYMENT_RU.md и TROUBLESHOOTING_RU.md.</li>
+          <li>Manual workflow infrastructure-recovery.yml для быстрого восстановления.</li>
+          <li>Ansible deploy как безопасный fallback при сбое SSH deploy в CI/CD.</li>
+        </ul>
+      </div>
+
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6">
+        <p class="text-4xl font-bold text-[#3FB950] font-lato mb-2">Recovery flow (упрощённо)</p>
+        <div class="grid grid-cols-4 gap-3">
+          <div class="bg-[#0D1117] border border-[#30363D] rounded-lg p-4 text-center"><p class="text-3xl text-[#E6EDF3] font-lato">1. terraform apply</p></div>
+          <div class="bg-[#0D1117] border border-[#30363D] rounded-lg p-4 text-center"><p class="text-3xl text-[#E6EDF3] font-lato">2. output IP/SSH</p></div>
+          <div class="bg-[#0D1117] border border-[#30363D] rounded-lg p-4 text-center"><p class="text-3xl text-[#E6EDF3] font-lato">3. update secrets</p></div>
+          <div class="bg-[#0D1117] border border-[#30363D] rounded-lg p-4 text-center"><p class="text-3xl text-[#E6EDF3] font-lato">4. deploy + verify</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-5">
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-col gap-3">
+        <i data-lucide="github" class="w-10 h-10 text-[#58A6FF]"></i>
+        <p class="text-3xl font-bold text-[#E6EDF3] font-lato">GitHub Actions</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">CI/CD + отдельный recovery workflow для аварийного восстановления.</p>
+      </div>
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-col gap-3">
+        <i data-lucide="server" class="w-10 h-10 text-[#58A6FF]"></i>
+        <p class="text-3xl font-bold text-[#E6EDF3] font-lato">DEPLOYMENT_SUMMARY.md</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">Единая точка правды по URL сервисов, проверкам и актуальному статусу деплоя.</p>
+      </div>
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-col gap-3">
+        <i data-lucide="gauge" class="w-10 h-10 text-[#58A6FF]"></i>
+        <p class="text-3xl font-bold text-[#E6EDF3] font-lato">Наблюдаемость после recovery</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">Проверка /health, Grafana dashboards и Prometheus targets после каждого восстановления.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-none flex flex-row items-center justify-between px-16 py-4 border-t border-[#30363D]">
+    <p class="text-3xl text-[#6E7681] font-lato">DevOpsUA6</p>
+    <p class="text-3xl text-[#6E7681] font-lato">Vitalii Zaburdaiev</p>
+    <p class="text-3xl text-[#6E7681] font-lato">github.com/zaburdaev/my-devops-project</p>
+  </div>
+
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

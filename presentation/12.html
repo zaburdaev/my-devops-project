@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>Итоги проекта</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Merriweather&display=swap');
+.font-lato { font-family: 'Lato', 'Corbel', sans-serif; }
+.font-merriweather { font-family: 'Merriweather', 'Constantia', serif; }
+</style>
+</head>
+<body class="m-0 p-0">
+<div class="relative overflow-hidden w-[1920px] h-[1080px] bg-[#0D1117] flex flex-col">
+
+  <div class="flex-none flex flex-row items-center gap-6 px-16 py-8">
+    <div class="bg-[#58A6FF]" style="width:6px; height:50px; border-radius:3px;"></div>
+    <i data-lucide="check-circle-2" class="w-12 h-12 text-[#58A6FF]"></i>
+    <h1 class="text-6xl font-bold font-lato text-[#E6EDF3] leading-tight">Итоги проекта: что реализовано</h1>
+  </div>
+
+  <div class="flex-1 min-h-0 grid grid-cols-2 gap-8 px-16 pb-4">
+    <div class="flex flex-col gap-5">
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-7">
+        <p class="text-4xl font-bold text-[#58A6FF] font-lato mb-3">✅ Приложение и API</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">Flask dashboard, health endpoint, Prometheus metrics, unit-тесты.</p>
+      </div>
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-7">
+        <p class="text-4xl font-bold text-[#58A6FF] font-lato mb-3">✅ Контейнеризация</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">Multi-stage Dockerfile, docker-compose стек, non-root runtime, healthcheck.</p>
+      </div>
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-7">
+        <p class="text-4xl font-bold text-[#58A6FF] font-lato mb-3">✅ Автоматизация</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">GitHub Actions CI/CD, Terraform + Ansible, Kubernetes манифесты и Helm chart.</p>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-5">
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-7">
+        <p class="text-4xl font-bold text-[#3FB950] font-lato mb-3">📊 Observability</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">Prometheus + Grafana с auto-provisioning dashboard и datasource.</p>
+      </div>
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-7">
+        <p class="text-4xl font-bold text-[#3FB950] font-lato mb-3">🔐 Security hardening</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">Убраны дефолтные секреты, усилены примеры .env, audit и best practices в документации.</p>
+      </div>
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-7">
+        <p class="text-4xl font-bold text-[#3FB950] font-lato mb-3">📚 Documentation</p>
+        <p class="text-3xl text-[#8B949E] font-merriweather">README/README_RU, beginner guide, demo script, troubleshooting и recovery runbook.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-none flex flex-row items-center justify-between px-16 py-4 border-t border-[#30363D]">
+    <p class="text-3xl text-[#6E7681] font-lato">DevOpsUA6</p>
+    <p class="text-3xl text-[#6E7681] font-lato">Vitalii Zaburdaiev</p>
+    <p class="text-3xl text-[#6E7681] font-lato">github.com/zaburdaev/my-devops-project</p>
+  </div>
+
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>
