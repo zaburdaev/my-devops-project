@@ -125,10 +125,12 @@ This project was created as a comprehensive DevOps course project (DevOpsUA6) to
    - **Prometheus:** http://localhost:9090
   
      
-5. If have GRAFANA login
+5. If have GRAFANA login issue 
    # Restart containers
 docker compose down
+
 docker compose up -d
+
 and update password
 
 ### 🔧 Optional: Direct Flask Access (Port 5000)
