@@ -21,7 +21,7 @@
 ### 3) Runtime Stack Consistency
 
 - Зафиксирован актуальный стек из `docker-compose.yml`: 6 сервисов
-- Удалены/обновлены противоречия о «7 сервисах» в ключевых доках и presentation layout plans
+- Удалены/обновлены противоречия по количеству сервисов в ключевых доках и presentation layout plans
 - Статус: **PASS**
 
 ### 4) Loki Removal Consistency
