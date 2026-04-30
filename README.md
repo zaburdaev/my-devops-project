@@ -117,6 +117,9 @@ This project was created as a comprehensive DevOps course project (DevOpsUA6) to
    ```bash
    docker compose up --build
    ```
+   Configure Grafana dashboard (wait 30 seconds after start):  
+
+   ./scripts/configure_grafana.sh
 
 4. **Access the application:**
    - **Main App (via Nginx):** http://localhost
