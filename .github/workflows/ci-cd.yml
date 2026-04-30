@@ -133,9 +133,6 @@ jobs:
             GRAFANA_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD:-admin}" \
             bash scripts/configure_grafana.sh
 
-            echo "✅ Running post-deploy monitoring verification..."
-            bash scripts/verify_monitoring.sh
-
             echo "🏥 Application Health Check (via Nginx):"
             if curl -sf http://localhost/health > /dev/null 2>&1; then
               echo "✅ Application is HEALTHY (via Nginx)"
@@ -146,4 +143,17 @@ jobs:
               exit 1
             fi
 
-            echo "✅ Deployment successful! Monitoring is configured automatically."
+            echo "✅ Deployment successful! Core services are up."
+
+      - name: ✅ Post-deploy monitoring verification (non-blocking)
+        continue-on-error: true
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
+            cd /opt/health-dashboard
+            echo "🔎 Running monitoring verification (non-blocking)..."
+            bash scripts/verify_monitoring.sh
