@@ -3,9 +3,29 @@ set -euo pipefail
 
 # This script is intended to run on the target server itself.
 # It configures Grafana using local endpoints and does not depend on external host variables.
-GRAFANA_USER="${1:-${GRAFANA_USER:-admin}}"
-GRAFANA_PASSWORD="${2:-${GRAFANA_PASSWORD:-admin}}"
+#
+# Supported invocation styles:
+#   1) ./configure_grafana.sh                            (uses env/defaults)
+#   2) ./configure_grafana.sh <user> <password>
+#   3) ./configure_grafana.sh <url> <user> <password>
 GRAFANA_URL="${GRAFANA_URL:-http://localhost:3000}"
+GRAFANA_USER="${GRAFANA_USER:-${GF_SECURITY_ADMIN_USER:-admin}}"
+GRAFANA_PASSWORD="${GRAFANA_PASSWORD:-${GF_SECURITY_ADMIN_PASSWORD:-admin}}"
+
+if [[ $# -eq 3 ]]; then
+  GRAFANA_URL="$1"
+  GRAFANA_USER="$2"
+  GRAFANA_PASSWORD="$3"
+elif [[ $# -eq 2 ]]; then
+  GRAFANA_USER="$1"
+  GRAFANA_PASSWORD="$2"
+elif [[ $# -eq 1 ]]; then
+  if [[ "$1" == http://* || "$1" == https://* ]]; then
+    GRAFANA_URL="$1"
+  else
+    GRAFANA_USER="$1"
+  fi
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DASHBOARD_FILE="${SCRIPT_DIR}/../grafana/working-dashboard.json"
@@ -34,46 +54,27 @@ curl -sS -X POST "${GRAFANA_URL}/api/datasources" \
 
 if [[ -f "${DASHBOARD_FILE}" ]]; then
   echo "Importing dashboard from ${DASHBOARD_FILE}..."
-  GRAFANA_URL="${GRAFANA_URL}" \
-  GRAFANA_USER="${GRAFANA_USER}" \
-  GRAFANA_PASSWORD="${GRAFANA_PASSWORD}" \
-  DASHBOARD_FILE="${DASHBOARD_FILE}" \
-  python3 - <<'PY'
-import base64
+
+  PAYLOAD_FILE="$(mktemp)"
+  trap 'rm -f "${PAYLOAD_FILE}"' EXIT
+
+  python3 - "${DASHBOARD_FILE}" > "${PAYLOAD_FILE}" <<'PY'
 import json
-import os
-import urllib.request
+import sys
 
-base_url = os.environ["GRAFANA_URL"].rstrip("/")
-user = os.environ["GRAFANA_USER"]
-password = os.environ["GRAFANA_PASSWORD"]
-file_path = os.environ["DASHBOARD_FILE"]
-
-with open(file_path, "r", encoding="utf-8") as f:
+with open(sys.argv[1], "r", encoding="utf-8") as f:
     dashboard = json.load(f)
 
-payload = json.dumps(
-    {
-        "dashboard": dashboard,
-        "folderId": 0,
-        "overwrite": True,
-    }
-).encode("utf-8")
-
-req = urllib.request.Request(
-    f"{base_url}/api/dashboards/db",
-    data=payload,
-    headers={"Content-Type": "application/json"},
-    method="POST",
-)
-req.add_header(
-    "Authorization",
-    "Basic " + base64.b64encode(f"{user}:{password}".encode("utf-8")).decode("ascii"),
-)
-
-with urllib.request.urlopen(req, timeout=30) as resp:
-    print(resp.read().decode("utf-8"))
+json.dump({"dashboard": dashboard, "folderId": 0, "overwrite": True}, sys.stdout)
 PY
+
+  curl -fsS -X POST "${GRAFANA_URL}/api/dashboards/db" \
+    -u "${GRAFANA_USER}:${GRAFANA_PASSWORD}" \
+    -H "Content-Type: application/json" \
+    --data-binary "@${PAYLOAD_FILE}" >/dev/null
+
+  rm -f "${PAYLOAD_FILE}"
+  trap - EXIT
 else
   echo "Dashboard file not found: ${DASHBOARD_FILE}"
 fi

@@ -113,8 +113,14 @@ jobs:
             source ./.env
             set +a
 
-            echo "🚀 Starting containers..."
-            docker compose up -d --build
+            echo "🛑 Stopping old containers..."
+            docker compose down
+
+            echo "📥 Pulling latest images..."
+            docker compose pull
+
+            echo "🚀 Rebuilding and starting fresh containers..."
+            docker compose up -d --build --force-recreate
 
             echo "⏳ Waiting for services to initialize..."
             sleep 30
@@ -123,10 +129,9 @@ jobs:
             docker compose ps
 
             echo "🎛️ Configuring Grafana datasource and dashboard import..."
-            bash scripts/configure_grafana.sh \
-              "localhost" \
-              "${GF_SECURITY_ADMIN_USER:-admin}" \
-              "${GF_SECURITY_ADMIN_PASSWORD:-admin}"
+            GRAFANA_USER="${GF_SECURITY_ADMIN_USER:-admin}" \
+            GRAFANA_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD:-admin}" \
+            bash scripts/configure_grafana.sh
 
             echo "✅ Running post-deploy monitoring verification..."
             bash scripts/verify_monitoring.sh
