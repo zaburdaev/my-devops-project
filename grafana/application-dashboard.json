@@ -1,0 +1,313 @@
+{
+  "id": null,
+  "uid": "health-dashboard-comprehensive",
+  "title": "Health Dashboard - Comprehensive Monitoring",
+  "tags": ["health-dashboard", "prometheus", "flask", "course-project"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "job",
+        "type": "query",
+        "label": "Prometheus Job",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "query": "label_values(up, job)",
+        "refresh": 1,
+        "includeAll": true,
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "flask-app",
+          "value": "flask-app"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Application Target Status",
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{job=\"flask-app\"}",
+          "legendFormat": "flask-app"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Prometheus Target Status",
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{job=\"prometheus\"}",
+          "legendFormat": "prometheus"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "type": "gauge",
+      "title": "CPU Usage (%)",
+      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "refId": "A", "expr": "system_cpu_usage_percent" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 60 },
+              { "color": "red", "value": 80 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "gauge",
+      "title": "Memory Usage (%)",
+      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "refId": "A", "expr": "system_memory_usage_percent" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 85 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "gauge",
+      "title": "Disk Usage (%)",
+      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "refId": "A", "expr": "system_disk_usage_percent" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 75 },
+              { "color": "red", "value": 90 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "HTTP Request Rate (RPS)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (method, endpoint) (rate(app_request_total[1m]))",
+          "legendFormat": "{{method}} {{endpoint}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["last", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "HTTP Requests per Endpoint (5m increase)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (endpoint) (increase(app_request_total[5m]))",
+          "legendFormat": "{{endpoint}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["last"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "HTTP Response Time p50 / p95",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.50, sum(rate(app_request_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p50"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.95, sum(rate(app_request_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["last", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "HTTP Average Response Time",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(app_request_latency_seconds_sum[5m])) / sum(rate(app_request_latency_seconds_count[5m]))",
+          "legendFormat": "avg latency"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["last", "max"] },
+        "tooltip": { "mode": "single", "sort": "none" }
+      }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "System Resource Trends",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "system_cpu_usage_percent", "legendFormat": "CPU %" },
+        { "refId": "B", "expr": "system_memory_usage_percent", "legendFormat": "Memory %" },
+        { "refId": "C", "expr": "system_disk_usage_percent", "legendFormat": "Disk %" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" }, "overrides": [] },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["last"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Prometheus Scrape Samples (flask-app)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "scrape_samples_scraped{job=\"flask-app\"}",
+          "legendFormat": "samples scraped"
+        },
+        {
+          "refId": "B",
+          "expr": "scrape_duration_seconds{job=\"flask-app\"}",
+          "legendFormat": "scrape duration"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["last", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      }
+    }
+  ],
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "links": []
+}
