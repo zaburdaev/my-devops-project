@@ -68,43 +68,79 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /opt/health-dashboard
+            set -euo pipefail
 
-            echo "📥 Pulling latest changes..."
-            git pull origin main
+            APP_DIR="/opt/health-dashboard"
+            REPO_URL="https://github.com/zaburdaev/my-devops-project.git"
+
+            echo "🚀 Starting deployment..."
+
+            if ! command -v git >/dev/null 2>&1; then
+              echo "📦 git not found, installing..."
+              if command -v yum >/dev/null 2>&1; then
+                sudo yum install -y git
+              elif command -v dnf >/dev/null 2>&1; then
+                sudo dnf install -y git
+              elif command -v apt-get >/dev/null 2>&1; then
+                sudo apt-get update -y
+                sudo apt-get install -y git
+              else
+                echo "❌ Unsupported package manager. Install git manually."
+                exit 1
+              fi
+            fi
+
+            sudo mkdir -p "${APP_DIR}"
+            sudo chown -R "$(whoami):$(whoami)" "${APP_DIR}"
+
+            if [ ! -d "${APP_DIR}/.git" ]; then
+              echo "📦 First deployment - cloning repository..."
+              git clone "${REPO_URL}" "${APP_DIR}"
+            else
+              echo "📥 Existing deployment - syncing repository with origin/main..."
+              cd "${APP_DIR}"
+              git fetch origin main
+              git reset --hard origin/main
+              git clean -fd
+            fi
+
+            cd "${APP_DIR}"
 
             if [ ! -f .env ]; then
-              echo "📝 Creating .env file..."
+              echo "📝 Creating .env from template..."
               cp .env.example .env
             fi
 
-            echo "🛑 Stopping old containers..."
-            docker compose down
+            set -a
+            source ./.env
+            set +a
 
-            echo "🚀 Starting new containers..."
+            echo "🚀 Starting containers..."
             docker compose up -d --build
 
-            echo "⏳ Waiting 30 seconds for services to fully start..."
+            echo "⏳ Waiting for services to initialize..."
             sleep 30
 
-            echo ""
             echo "📊 Container Status:"
             docker compose ps
 
-            echo ""
-            echo "🏥 Application Health Check:"
-            echo "=============================="
+            echo "🎛️ Configuring Grafana datasource and dashboard import..."
+            bash scripts/configure_grafana.sh \
+              "localhost" \
+              "${GF_SECURITY_ADMIN_USER:-admin}" \
+              "${GF_SECURITY_ADMIN_PASSWORD:-admin}"
 
-            # Check via Nginx (main production endpoint)
+            echo "✅ Running post-deploy monitoring verification..."
+            bash scripts/verify_monitoring.sh
+
+            echo "🏥 Application Health Check (via Nginx):"
             if curl -sf http://localhost/health > /dev/null 2>&1; then
               echo "✅ Application is HEALTHY (via Nginx)"
               curl -s http://localhost/health | jq '.' 2>/dev/null || curl -s http://localhost/health
             else
               echo "❌ Application health check FAILED"
-              echo "Checking container logs..."
               docker compose logs app --tail=20
               exit 1
             fi
 
-            echo "=============================="
-            echo "✅ Deployment successful!"
+            echo "✅ Deployment successful! Monitoring is configured automatically."

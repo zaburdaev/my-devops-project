@@ -139,6 +139,26 @@ steps:
 
 **Why this matters:** Automatically deploys new code to the server without manual intervention. The deployment script handles both initial (first-time) and subsequent deployments automatically — no need to manually set up the server directory beforehand.
 
+### 📊 Monitoring Auto-Configuration During Deploy
+
+Monitoring is configured **automatically** as part of the deploy job:
+
+1. `docker compose up -d --build` starts Prometheus, Grafana, and application services.
+2. `scripts/configure_grafana.sh` is executed on the server:
+   - ensures Prometheus datasource exists in Grafana,
+   - imports `grafana/working-dashboard.json`.
+3. `scripts/verify_monitoring.sh` runs post-deploy checks:
+   - Prometheus is healthy and scraping `prometheus` + `flask-app` targets,
+   - Grafana is healthy,
+   - dashboard UID `health-dashboard-working` exists.
+
+### ♻️ What happens to Grafana dashboards after redeployment?
+
+- Grafana data is stored in the named Docker volume `grafana_data`, so dashboards and settings persist across regular redeploys.
+- Prometheus metrics storage also persists in the `prometheus_data` named volume.
+- Dashboard provisioning from `monitoring/grafana/dashboards/` and the explicit import script ensure the **working dashboard is present after each pipeline run**.
+- Dashboard data is reset only if volumes are removed explicitly (for example with `docker compose down -v`).
+
 > ⚠️ **Note:** The Deploy stage requires a running server and configured SSH access. Without these, the step is gracefully skipped — this is expected for development/educational setups.
 >
 > 💡 **Tip:** Alternatively, you can run the Ansible playbook first to prepare the server:
