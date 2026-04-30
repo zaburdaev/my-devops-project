@@ -11,7 +11,7 @@ GRAFANA_USER="${2:-admin}"
 GRAFANA_PASSWORD="${3:-admin}"
 GRAFANA_URL="http://${SERVER_HOST}:3000"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DASHBOARD_FILE="${SCRIPT_DIR}/../grafana/dashboard.json"
+DASHBOARD_FILE="${SCRIPT_DIR}/../grafana/working-dashboard.json"
 
 echo "Waiting for Grafana to be ready at ${GRAFANA_URL}..."
 for i in {1..30}; do
@@ -33,17 +33,6 @@ curl -sS -X POST "${GRAFANA_URL}/api/datasources" \
     "url": "http://prometheus:9090",
     "access": "proxy",
     "isDefault": true
-  }' >/dev/null || true
-
-echo "Configuring Loki data source..."
-curl -sS -X POST "${GRAFANA_URL}/api/datasources" \
-  -u "${GRAFANA_USER}:${GRAFANA_PASSWORD}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Loki",
-    "type": "loki",
-    "url": "http://loki:3100",
-    "access": "proxy"
   }' >/dev/null || true
 
 if [[ -f "${DASHBOARD_FILE}" ]]; then

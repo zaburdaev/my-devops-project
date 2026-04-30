@@ -50,25 +50,23 @@
 
 ## 4. Принципы построения дашборда
 
-Создан отдельный дашборд:
+Создан отдельный рабочий дашборд (без `No Data`):
 
-- Файл: `grafana/application-dashboard.json`
-- Название: **Health Dashboard - Comprehensive Monitoring**
-- UID: `health-dashboard-comprehensive`
+- Файл: `grafana/working-dashboard.json`
+- Название: **Health Dashboard (Working Metrics)**
+- UID: `health-dashboard-working`
 
 ### Что показывает дашборд
 
-1. **Application Target Status** — доступность Flask target (`up{job="flask-app"}`)
-2. **Prometheus Target Status** — статус самого Prometheus (`up{job="prometheus"}`)
-3. **CPU Usage (%)** — загрузка CPU
-4. **Memory Usage (%)** — загрузка RAM
-5. **Disk Usage (%)** — заполнение диска
-6. **HTTP Request Rate (RPS)** — запросы/сек по endpoint’ам
-7. **HTTP Requests per Endpoint (5m increase)** — прирост запросов по endpoint за 5 минут
-8. **HTTP Response Time p50 / p95** — медианная и 95-й перцентиль задержки
-9. **HTTP Average Response Time** — среднее время ответа
-10. **System Resource Trends** — тренды CPU/RAM/Disk
-11. **Prometheus Scrape Samples** — сколько сэмплов собирает Prometheus и длительность scrape
+1. **Flask Target Status** — доступность приложения (`up{job="flask-app"}`)
+2. **Prometheus Target Status** — доступность Prometheus (`up{job="prometheus"}`)
+3. **CPU Usage (%)** — `system_cpu_usage_percent`
+4. **Memory Usage (%)** — `system_memory_usage_percent`
+5. **Disk Usage (%)** — `system_disk_usage_percent`
+6. **Total Request Rate (req/s)** — `sum(rate(app_request_total[5m]))`
+7. **Request Rate by Endpoint** — `sum by (endpoint) (rate(app_request_total[5m]))`
+8. **HTTP Latency p95 (s)** — `histogram_quantile(0.95, sum by (le) (rate(app_request_latency_seconds_bucket[5m])))`
+9. **HTTP Average Latency (s)** — `sum(rate(app_request_latency_seconds_sum[5m])) / sum(rate(app_request_latency_seconds_count[5m]))`
 
 ---
 
@@ -114,9 +112,9 @@
 
 После этого на графиках появились:
 
-- ненулевой `request_rate`
-- значения latency (в т.ч. p95)
-- обновление счётчиков запросов и временных рядов
+- ненулевой `sum(rate(app_request_total[5m]))`
+- значения latency (в т.ч. p95 через `app_request_latency_seconds_bucket`)
+- обновление счётчиков `app_request_total` и временных рядов
 
 ---
 

@@ -13,7 +13,7 @@
    - Prometheus: `http://3.127.155.114:9090`
    - Приложение: `http://3.127.155.114`
 2. Войти в Grafana (admin/admin).
-3. Выбрать дашборд: **Health Dashboard - Comprehensive Monitoring**.
+3. Выбрать дашборд: **Health Dashboard (Working Metrics)**.
 4. Установить период просмотра `Last 1 hour`, автообновление `10s`.
 
 **Тезис:** «Сейчас покажу полный цикл: сбор метрик → хранение → визуализация».
@@ -100,9 +100,10 @@
 ### Что показывать
 
 - Панели:
-  - HTTP Request Rate (RPS)
-  - HTTP Response Time p50 / p95
-  - HTTP Average Response Time
+  - Total Request Rate (req/s)
+  - Request Rate by Endpoint (req/s)
+  - HTTP Latency p95 (s)
+  - HTTP Average Latency (s)
 
 ### Что говорить
 
