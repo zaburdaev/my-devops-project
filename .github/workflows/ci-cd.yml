@@ -106,10 +106,8 @@ jobs:
 
             cd "${APP_DIR}"
 
-            if [ ! -f .env ]; then
-              echo "📝 Creating .env from template..."
-              cp .env.example .env
-            fi
+            echo "📝 Regenerating .env from .env.example..."
+            cp -f .env.example .env
 
             set -a
             source ./.env
