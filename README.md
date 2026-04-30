@@ -1,4 +1,4 @@
-# 🏥 Health Monitoring Dashboard
+#  Health Monitoring Dashboard
 
 [![CI/CD Pipeline](https://github.com/zaburdaev/my-devops-project/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/zaburdaev/my-devops-project/actions/workflows/ci-cd.yml)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)](https://hub.docker.com/r/oskalibriya/health-dashboard)
