@@ -448,7 +448,7 @@ This project is licensed under the MIT License — see the [LICENSE](./LICENSE) 
 - **Project Link:** [github.com/zaburdaev/my-devops-project](https://github.com/zaburdaev/my-devops-project)
 
 ---
-Live demo check 2
+Live demo check 3
 __
 
 <p align="center">
