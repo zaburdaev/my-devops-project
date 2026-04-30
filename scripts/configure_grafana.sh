@@ -56,24 +56,51 @@ if [[ -f "${DASHBOARD_FILE}" ]]; then
   echo "Importing dashboard from ${DASHBOARD_FILE}..."
 
   PAYLOAD_FILE="$(mktemp)"
-  trap 'rm -f "${PAYLOAD_FILE}"' EXIT
+  RESPONSE_FILE="$(mktemp)"
+  trap 'rm -f "${PAYLOAD_FILE}" "${RESPONSE_FILE}"' EXIT
 
   python3 - "${DASHBOARD_FILE}" > "${PAYLOAD_FILE}" <<'PY'
 import json
 import sys
 
 with open(sys.argv[1], "r", encoding="utf-8") as f:
-    dashboard = json.load(f)
+    raw = json.load(f)
 
-json.dump({"dashboard": dashboard, "folderId": 0, "overwrite": True}, sys.stdout)
+if isinstance(raw, dict) and "dashboard" in raw:
+    payload = dict(raw)
+    payload.setdefault("folderId", 0)
+    payload.setdefault("overwrite", True)
+else:
+    payload = {"dashboard": raw, "folderId": 0, "overwrite": True}
+
+payload.setdefault("message", "Automated dashboard import from configure_grafana.sh")
+
+dashboard = payload.get("dashboard")
+if not isinstance(dashboard, dict) or not dashboard.get("title"):
+    raise SystemExit("Invalid dashboard JSON: missing dashboard.title")
+
+json.dump(payload, sys.stdout)
 PY
 
-  curl -fsS -X POST "${GRAFANA_URL}/api/dashboards/db" \
+  HTTP_STATUS="$(curl -sS -o "${RESPONSE_FILE}" -w "%{http_code}" -X POST "${GRAFANA_URL}/api/dashboards/db" \
     -u "${GRAFANA_USER}:${GRAFANA_PASSWORD}" \
     -H "Content-Type: application/json" \
-    --data-binary "@${PAYLOAD_FILE}" >/dev/null
+    -H "Accept: application/json" \
+    --data-binary "@${PAYLOAD_FILE}")"
 
-  rm -f "${PAYLOAD_FILE}"
+  if [[ "${HTTP_STATUS}" =~ ^2[0-9]{2}$ ]]; then
+    echo "✅ Dashboard imported successfully (HTTP ${HTTP_STATUS})."
+  else
+    echo "❌ Dashboard import failed (HTTP ${HTTP_STATUS})."
+    echo "Grafana response:"
+    cat "${RESPONSE_FILE}"
+    echo
+    echo "Payload preview:"
+    python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1])), indent=2)[:2000])' "${PAYLOAD_FILE}" || true
+    exit 1
+  fi
+
+  rm -f "${PAYLOAD_FILE}" "${RESPONSE_FILE}"
   trap - EXIT
 else
   echo "Dashboard file not found: ${DASHBOARD_FILE}"
