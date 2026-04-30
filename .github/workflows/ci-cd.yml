@@ -116,8 +116,8 @@ jobs:
             echo "🛑 Stopping old containers..."
             docker compose down
 
-            echo "📥 Pulling latest images..."
-            docker compose pull
+            echo "📥 Pulling pre-built images only (skipping buildable services)..."
+            docker compose pull --ignore-buildable
 
             echo "🚀 Rebuilding and starting fresh containers..."
             docker compose up -d --build --force-recreate
