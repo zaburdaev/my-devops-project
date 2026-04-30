@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # This script is intended to run on the target server itself.
-# It configures Grafana using local endpoints and does not require SERVER_HOST.
+# It configures Grafana using local endpoints and does not depend on external host variables.
 GRAFANA_USER="${1:-${GRAFANA_USER:-admin}}"
 GRAFANA_PASSWORD="${2:-${GRAFANA_PASSWORD:-admin}}"
 GRAFANA_URL="${GRAFANA_URL:-http://localhost:3000}"
