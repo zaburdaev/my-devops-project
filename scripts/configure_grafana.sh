@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -lt 1 ]]; then
-  echo "Usage: $0 <server_ip_or_host> [grafana_user] [grafana_password]"
-  exit 1
-fi
+# This script is intended to run on the target server itself.
+# It configures Grafana using local endpoints and does not require SERVER_HOST.
+GRAFANA_USER="${1:-${GRAFANA_USER:-admin}}"
+GRAFANA_PASSWORD="${2:-${GRAFANA_PASSWORD:-admin}}"
+GRAFANA_URL="${GRAFANA_URL:-http://localhost:3000}"
 
-SERVER_HOST="$1"
-GRAFANA_USER="${2:-admin}"
-GRAFANA_PASSWORD="${3:-admin}"
-GRAFANA_URL="http://${SERVER_HOST}:3000"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DASHBOARD_FILE="${SCRIPT_DIR}/../grafana/working-dashboard.json"
 
@@ -37,35 +34,48 @@ curl -sS -X POST "${GRAFANA_URL}/api/datasources" \
 
 if [[ -f "${DASHBOARD_FILE}" ]]; then
   echo "Importing dashboard from ${DASHBOARD_FILE}..."
+  GRAFANA_URL="${GRAFANA_URL}" \
+  GRAFANA_USER="${GRAFANA_USER}" \
+  GRAFANA_PASSWORD="${GRAFANA_PASSWORD}" \
+  DASHBOARD_FILE="${DASHBOARD_FILE}" \
   python3 - <<'PY'
-import json, os, urllib.request
+import base64
+import json
+import os
+import urllib.request
 
-server = os.environ['SERVER_HOST']
-user = os.environ['GRAFANA_USER']
-password = os.environ['GRAFANA_PASSWORD']
-file_path = os.environ['DASHBOARD_FILE']
+base_url = os.environ["GRAFANA_URL"].rstrip("/")
+user = os.environ["GRAFANA_USER"]
+password = os.environ["GRAFANA_PASSWORD"]
+file_path = os.environ["DASHBOARD_FILE"]
 
-with open(file_path, 'r', encoding='utf-8') as f:
+with open(file_path, "r", encoding="utf-8") as f:
     dashboard = json.load(f)
 
-payload = json.dumps({
-    "dashboard": dashboard,
-    "folderId": 0,
-    "overwrite": True
-}).encode('utf-8')
+payload = json.dumps(
+    {
+        "dashboard": dashboard,
+        "folderId": 0,
+        "overwrite": True,
+    }
+).encode("utf-8")
 
 req = urllib.request.Request(
-    f"http://{server}:3000/api/dashboards/db",
+    f"{base_url}/api/dashboards/db",
     data=payload,
     headers={"Content-Type": "application/json"},
-    method="POST"
+    method="POST",
 )
-base64_auth = (f"{user}:{password}").encode('utf-8')
-import base64
-req.add_header('Authorization', 'Basic ' + base64.b64encode(base64_auth).decode('ascii'))
+req.add_header(
+    "Authorization",
+    "Basic " + base64.b64encode(f"{user}:{password}".encode("utf-8")).decode("ascii"),
+)
+
 with urllib.request.urlopen(req, timeout=30) as resp:
-    print(resp.read().decode('utf-8'))
+    print(resp.read().decode("utf-8"))
 PY
+else
+  echo "Dashboard file not found: ${DASHBOARD_FILE}"
 fi
 
 echo "Grafana configuration completed."
