@@ -29,6 +29,10 @@ jobs:
         working-directory: terraform
         run: terraform init
 
+      - name: Terraform Destroy (clean slate)
+        working-directory: terraform
+        run: terraform destroy -auto-approve || true
+
       - name: Terraform Apply
         working-directory: terraform
         run: terraform apply -auto-approve
