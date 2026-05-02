@@ -131,7 +131,7 @@ jobs:
             echo "🎛️ Configuring Grafana datasource and dashboard import..."
             GRAFANA_USER="${GF_SECURITY_ADMIN_USER:-admin}" \
             GRAFANA_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD:-admin}" \
-            bash scripts/configure_grafana.sh
+            bash scripts/configure_grafana.sh || echo "⚠️ Grafana configuration failed (non-critical), continuing..."
 
             echo "🏥 Application Health Check (via Nginx):"
             if curl -sf http://localhost/health > /dev/null 2>&1; then
