@@ -2,7 +2,7 @@
 
 **Автор:** Vitalii Zaburdaiev  
 **Проект:** Health Dashboard | DevOpsUA6  
-**Актуальный IP:** `18.156.160.162`  
+**Актуальный IP:** `52.59.86.193`  
 **EC2 Instance:** `i-059c8320d831be2bf`
 
 ---
@@ -121,7 +121,7 @@ deploy:
 4. **Динамический inventory** — генерируем файл `inventory.ini` с актуальным IP сервера:
    ```ini
    [webservers]
-   production ansible_host=18.156.160.162 ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/deploy_key
+   production ansible_host=52.59.86.193 ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/deploy_key
    ```
 5. **Ansible Playbook** — запускаем плейбук, который:
    - Устанавливает Docker (если не установлен)
@@ -339,7 +339,7 @@ terraform/
 │  └──────────────┬──────────────────────┘                    │
 │                 │                                            │
 │  ┌──────────────▼──────────────────────┐                    │
-│  │ Elastic IP: 18.156.160.162          │                    │
+│  │ Elastic IP: 52.59.86.193          │                    │
 │  │  (привязан к EC2)                   │                    │
 │  └─────────────────────────────────────┘                    │
 │                                                             │
@@ -544,7 +544,7 @@ post_tasks
 
 | Секрет | Описание | Пример |
 |--------|----------|--------|
-| `SERVER_HOST` | IP сервера | `18.156.160.162` |
+| `SERVER_HOST` | IP сервера | `52.59.86.193` |
 | `SERVER_USER` | SSH пользователь | `ec2-user` |
 | `SSH_PRIVATE_KEY` | Приватный SSH ключ | Содержимое `.pem` файла |
 | `DOCKER_USERNAME` | Docker Hub логин | `zaburdaev` |
@@ -595,7 +595,7 @@ post_tasks
                                    │
                                    ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                    AWS EC2: 18.156.160.162                                │
+│                    AWS EC2: 52.59.86.193                                │
 │                                                                          │
 │  ┌──────────────────────────────────────────────────────────────────┐    │
 │  │                    DOCKER COMPOSE                                │    │

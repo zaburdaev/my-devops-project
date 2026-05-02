@@ -35,7 +35,7 @@
 - **Report:** [DOCUMENTATION_AUDIT.md](DOCUMENTATION_AUDIT.md)
 - **Status:** All 44+ markdown files checked and updated
 - **Changes:**
-  - All IP addresses updated to Elastic IP: 18.156.160.162
+  - All IP addresses updated to Elastic IP: 52.59.86.193
   - Service count updated from 7 to 6 (Loki removed)
   - Monitoring intervals updated (60s scrape)
   - All GitHub links verified
@@ -72,13 +72,13 @@
 
 | Service | URL | Status |
 |---------|-----|--------|
-| Application | http://18.156.160.162:5000 | ✅ Running |
-| Health Check | http://18.156.160.162:5000/health | ✅ Healthy |
-| Grafana | http://18.156.160.162:3000 | ✅ Fast & Responsive |
-| Prometheus | http://18.156.160.162:9090 | ✅ Collecting Metrics |
-| Nginx | http://18.156.160.162 | ✅ Running |
+| Application | http://52.59.86.193:5000 | ✅ Running |
+| Health Check | http://52.59.86.193:5000/health | ✅ Healthy |
+| Grafana | http://52.59.86.193:3000 | ✅ Fast & Responsive |
+| Prometheus | http://52.59.86.193:9090 | ✅ Collecting Metrics |
+| Nginx | http://52.59.86.193 | ✅ Running |
 
-**Static Elastic IP:** 18.156.160.162 (never changes)
+**Static Elastic IP:** 52.59.86.193 (never changes)
 
 ---
 
@@ -135,11 +135,11 @@ See [SECURITY_BEST_PRACTICES.md](docs/SECURITY_BEST_PRACTICES.md) for details.
 ### What to Show Professor
 
 1. **Live Application**
-   - Open: http://18.156.160.162:5000/health
+   - Open: http://52.59.86.193:5000/health
    - Show: Healthy status response
 
 2. **Grafana Dashboard**
-   - Open: http://18.156.160.162:3000
+   - Open: http://52.59.86.193:3000
    - Login: admin/admin (configured via .env)
    - Show: Real-time metrics with green status panels
    - Demonstrate: Fast loading (<1 second)

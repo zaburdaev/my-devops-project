@@ -60,5 +60,5 @@
 - Loki: **removed from runtime stack**
 - Logs: `docker compose logs`
 - Prometheus scrape/eval interval: `60s`
-- Public AWS IP: `18.156.160.162`
+- Public AWS IP: `52.59.86.193`
 - Grafana credentials source: `.env` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`)
