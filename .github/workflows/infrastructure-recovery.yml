@@ -99,6 +99,31 @@ jobs:
           terraform output -raw ssh_private_key > /tmp/ssh_key.pem
           chmod 600 /tmp/ssh_key.pem
 
+      # ============================================
+      # STEP 3: Update GitHub Secrets with new creds
+      # This ensures CI/CD pipeline uses the correct
+      # SSH key and IP after infrastructure recreation
+      # ============================================
+      - name: 🔑 Update GitHub Secrets with new credentials
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          SERVER_IP: ${{ steps.tf.outputs.server_ip }}
+        run: |
+          echo "=== Updating SERVER_HOST secret ==="
+          echo -n "$SERVER_IP" | gh secret set SERVER_HOST --repo ${{ github.repository }}
+          echo "✅ SERVER_HOST updated to $SERVER_IP"
+
+          echo "=== Updating SSH_PRIVATE_KEY secret ==="
+          cd terraform
+          terraform output -raw ssh_private_key | gh secret set SSH_PRIVATE_KEY --repo ${{ github.repository }}
+          echo "✅ SSH_PRIVATE_KEY updated"
+
+          echo "=== Verifying SERVER_USER ==="
+          echo -n "ec2-user" | gh secret set SERVER_USER --repo ${{ github.repository }}
+          echo "✅ SERVER_USER confirmed as ec2-user"
+
+          echo "=== All GitHub Secrets updated successfully ==="
+
       - name: ⏳ Wait for instance boot (90s)
         run: sleep 90
 
