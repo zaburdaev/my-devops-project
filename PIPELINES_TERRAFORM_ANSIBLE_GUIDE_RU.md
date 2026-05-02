@@ -2,8 +2,9 @@
 
 **Автор:** Vitalii Zaburdaiev  
 **Проект:** Health Dashboard | DevOpsUA6  
-**Актуальный IP:** `52.59.86.193`  
-**EC2 Instance:** `i-059c8320d831be2bf`
+**Постоянный IP:** `52.59.86.193` (Persistent Elastic IP — не меняется при recovery)  
+**EC2 Instance:** `i-08c0b5da779c84e57`  
+**EIP Allocation ID:** `eipalloc-04509284aae88c6a3`
 
 ---
 
@@ -187,9 +188,10 @@ Developer pushes code
 ### ⚠️ Важно
 
 - Запускается **вручную** (кнопка "Run workflow" в GitHub Actions)
-- **Уничтожает** все текущие ресурсы AWS и создаёт новые
-- **Новый IP** — при каждом запуске выделяется НОВЫЙ Elastic IP
-- После запуска нужно обновить `SERVER_HOST` в GitHub Secrets
+- **Пересоздаёт** EC2, Key Pair, Security Group
+- **Elastic IP сохраняется** — IP `52.59.86.193` остаётся постоянным (не удаляется и не пересоздаётся)
+- `SERVER_HOST` в GitHub Secrets **не нужно обновлять** — IP не меняется
+- Подробнее: см. `docs/PERSISTENT_IP_GUIDE_RU.md`
 
 ### 📋 Пошаговый разбор
 
@@ -199,7 +201,7 @@ Developer pushes code
 🧹 Clean orphaned AWS resources
 ├── Terminate running EC2 instances (по тегу Project=my-devops-project)
 ├── Delete Key Pair (my-devops-key)
-├── Release ALL Elastic IPs (по тегу health-dashboard-eip)
+├── ✅ Elastic IP СОХРАНЯЕТСЯ (persistent IP mode)
 └── Delete Security Group (health-dashboard-sg)
 ```
 
@@ -215,10 +217,10 @@ Developer pushes code
 🚀 Terraform Apply
 ├── Создаёт Key Pair (SSH ключ)
 ├── Создаёт Security Group (порты 22,80,443,3000,5000,9090)
-├── Создаёт EC2 Instance (Amazon Linux 2023, t2.micro)
+├── Создаёт EC2 Instance (Amazon Linux 2023, t3.micro)
 │   └── user_data: установка Docker, Docker Compose
-├── Создаёт Elastic IP
-└── Привязывает EIP к EC2
+├── ♻️ Переиспользует Elastic IP (52.59.86.193 — persistent)
+└── Привязывает существующий EIP к новому EC2
 ```
 
 #### Шаг 3: Деплой приложения (SSH)
@@ -254,7 +256,7 @@ Admin clicks "Run workflow"
 │ AWS CLI          │
 │ ├── Kill EC2     │
 │ ├── Delete Keys  │
-│ ├── Release EIPs │
+│ ├── Keep EIP ✅  │
 │ └── Delete SGs   │
 └────────┬─────────┘
          │
@@ -265,7 +267,7 @@ Admin clicks "Run workflow"
 │ ├── Key Pair     │
 │ ├── Sec. Group   │
 │ ├── EC2 Instance │
-│ └── Elastic IP   │
+│ └── Reuse EIP ♻️ │
 └────────┬─────────┘
          │
          ▼
@@ -292,9 +294,9 @@ Admin clicks "Run workflow"
 └──────────────────┘
          │
          ▼
-  Обновить SERVER_HOST
-  в GitHub Secrets
-  с новым IP!
+  ✅ IP не изменился!
+  SERVER_HOST = 52.59.86.193
+  (обновляется автоматически)
 ```
 
 ---
@@ -353,7 +355,9 @@ terraform/
 | **State** | `terraform.tfstate` — JSON файл, где Terraform помнит что он создал |
 | **Idempotent** | Повторный `apply` не создаст дубликаты (сравнивает со state) |
 | **user_data** | Bash-скрипт, выполняемый при ПЕРВОМ запуске EC2 |
-| **Elastic IP** | Статический IP, переживает перезагрузку EC2 |
+| **Elastic IP** | Статический IP, переживает перезагрузку EC2 и recovery (persistent) |
+| **prevent_destroy** | Lifecycle-правило, запрещающее Terraform удалять ресурс |
+| **ignore_changes** | Lifecycle-правило, игнорирующее изменения указанных атрибутов |
 
 ---
 
@@ -557,9 +561,11 @@ post_tasks
 | `AWS_ACCESS_KEY_ID` | AWS ключ доступа | `AKIA...` |
 | `AWS_SECRET_ACCESS_KEY` | AWS секретный ключ | `wJal...` |
 
-### ⚠️ После infrastructure-recovery.yml
+### ✅ После infrastructure-recovery.yml
 
-Новый IP будет выведен в логах. Нужно **вручную** обновить `SERVER_HOST` в GitHub Secrets.
+IP **не меняется** благодаря Persistent Elastic IP. Workflow автоматически обновляет `SERVER_HOST` и `SSH_PRIVATE_KEY` в GitHub Secrets. Ручные действия **не требуются**.
+
+> 📖 Подробнее о Persistent IP: см. `docs/PERSISTENT_IP_GUIDE_RU.md`
 
 ---
 
