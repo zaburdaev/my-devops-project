@@ -307,7 +307,7 @@ aws ec2 describe-instances \
 ssh -i my-devops-key.pem ec2-user@<IP_АДРЕС>
 
 # Пример:
-ssh -i my-devops-key.pem ec2-user@52.59.86.193
+ssh -i my-devops-key.pem ec2-user@18.197.7.122
 ```
 
 **⚠️ Важно:**
@@ -673,7 +673,7 @@ ssh -i key.pem user@ip "command"         # Выполнение команды
 
 В проекте используется **persistent Elastic IP**. Текущий рабочий адрес:
 
-- **52.59.86.193**
+- **18.197.7.122**
 
 Это означает:
 - Recovery workflow удаляет только EC2/Key Pair/Security Group.
@@ -705,18 +705,18 @@ chmod 600 my-devops-key.pem
 terraform output -raw elastic_ip
 ```
 
-Ожидаемый результат: `terraform output -raw elastic_ip` возвращает **52.59.86.193**.
+Ожидаемый результат: `terraform output -raw elastic_ip` возвращает **18.197.7.122**.
 
 ### GitHub Secrets при persistent EIP
 
-- `SERVER_HOST` обычно **не меняется** (остаётся 52.59.86.193)
+- `SERVER_HOST` обычно **не меняется** (остаётся 18.197.7.122)
 - `SERVER_USER` = `ec2-user`
 - `SSH_PRIVATE_KEY` обновляйте только если ключ был пересоздан
 
 ### Проверка после recovery
 
-1. `http://52.59.86.193/health`
-2. `http://52.59.86.193:3000`
-3. `http://52.59.86.193:9090`
+1. `http://18.197.7.122/health`
+2. `http://18.197.7.122:3000`
+3. `http://18.197.7.122:9090`
 
 > ⚠️ Если нужно полностью удалить инфраструктуру вместе с EIP, сначала временно уберите `prevent_destroy` у `aws_eip.app_eip`, выполните `terraform apply`, и только потом `terraform destroy`.

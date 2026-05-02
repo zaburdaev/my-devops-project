@@ -13,6 +13,8 @@ env:
   SG_NAME: health-dashboard-sg
   EIP_TAG: health-dashboard-eip
   PROJECT_TAG: my-devops-project
+  # Current production IP that should stay stable across recoveries
+  PREFERRED_EIP: 18.197.7.122
 
 jobs:
   recover:
@@ -34,61 +36,106 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # ============================================
-      # STEP 1: Clean up orphaned AWS resources (except EIP)
-      # This handles the case when EC2 was deleted manually.
-      # EIP is intentionally preserved to keep a stable public IP.
-      # ============================================
-      - name: 🧹 Clean orphaned AWS resources (AWS CLI)
+      - name: 🧹 Clean orphaned AWS resources and select persistent EIP
         run: |
-          set -x
-          echo "=== Terminating any running instances ==="
+          set -euo pipefail
+
+          echo "=== Terminating any running/stopped project instances ==="
           INSTANCE_IDS=$(aws ec2 describe-instances \
-            --filters "Name=tag:Project,Values=$PROJECT_TAG" "Name=instance-state-name,Values=running,stopped,pending" \
-            --query 'Reservations[*].Instances[*].InstanceId' --output text) || true
-          if [ -n "$INSTANCE_IDS" ] && [ "$INSTANCE_IDS" != "None" ]; then
+            --filters "Name=tag:Project,Values=$PROJECT_TAG" "Name=instance-state-name,Values=running,stopped,pending,stopping" \
+            --query 'Reservations[*].Instances[*].InstanceId' --output text || true)
+
+          if [ -n "${INSTANCE_IDS:-}" ] && [ "$INSTANCE_IDS" != "None" ]; then
             aws ec2 terminate-instances --instance-ids $INSTANCE_IDS || true
-            echo "Waiting for instances to terminate..."
-            aws ec2 wait instance-terminated --instance-ids $INSTANCE_IDS --cli-read-timeout 120 || true
+            aws ec2 wait instance-terminated --instance-ids $INSTANCE_IDS || true
           fi
-          echo "✅ Instances cleaned"
 
-          echo "=== Deleting Key Pair ==="
+          echo "=== Delete old key pair and security group (safe cleanup) ==="
           aws ec2 delete-key-pair --key-name "$KEY_NAME" 2>/dev/null || true
-          echo "✅ Key Pair cleaned"
 
-          echo "=== Keeping Elastic IP untouched (persistent IP mode) ==="
-          EIP_INFO=$(aws ec2 describe-addresses \
-            --filters "Name=tag:Name,Values=$EIP_TAG" \
-            --query 'Addresses[*].[PublicIp,AllocationId,AssociationId,InstanceId]' --output text) || true
-          if [ -n "$EIP_INFO" ] && [ "$EIP_INFO" != "None" ]; then
-            echo "Persistent EIP found (will be reused by Terraform):"
-            echo "$EIP_INFO"
-          else
-            echo "⚠️ Tagged EIP not found; Terraform will create it on this run"
-          fi
-
-          echo "=== Deleting Security Group ==="
           SG_ID=$(aws ec2 describe-security-groups \
             --filters "Name=group-name,Values=$SG_NAME" \
-            --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null) || true
-          if [ -n "$SG_ID" ] && [ "$SG_ID" != "None" ]; then
+            --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null || true)
+          if [ -n "${SG_ID:-}" ] && [ "$SG_ID" != "None" ]; then
             aws ec2 delete-security-group --group-id "$SG_ID" 2>/dev/null || true
           fi
-          echo "✅ Security Group cleaned"
 
-          echo "=== All orphaned resources cleaned ==="
+          echo "=== Discover tagged EIPs ==="
+          mapfile -t EIP_LINES < <(aws ec2 describe-addresses \
+            --filters "Name=tag:Name,Values=$EIP_TAG" "Name=tag:Project,Values=$PROJECT_TAG" \
+            --query 'Addresses[*].[AllocationId,PublicIp,AssociationId,InstanceId]' --output text | sort -k2)
 
-      # ============================================
-      # STEP 2: Terraform creates everything fresh
-      # ============================================
+          if [ ${#EIP_LINES[@]} -gt 0 ]; then
+            printf '%s\n' "${EIP_LINES[@]}"
+          else
+            echo "No tagged EIPs found"
+          fi
+
+          SELECTED_ALLOC=""
+          SELECTED_IP=""
+
+          # 1) Prefer currently associated one (minimal downtime)
+          for line in "${EIP_LINES[@]:-}"; do
+            alloc=$(awk '{print $1}' <<< "$line")
+            ip=$(awk '{print $2}' <<< "$line")
+            assoc=$(awk '{print $3}' <<< "$line")
+            if [ "$assoc" != "None" ] && [ -n "$assoc" ]; then
+              SELECTED_ALLOC="$alloc"
+              SELECTED_IP="$ip"
+              break
+            fi
+          done
+
+          # 2) Otherwise prefer configured target static IP if still available
+          if [ -z "$SELECTED_ALLOC" ]; then
+            for line in "${EIP_LINES[@]:-}"; do
+              alloc=$(awk '{print $1}' <<< "$line")
+              ip=$(awk '{print $2}' <<< "$line")
+              if [ "$ip" = "$PREFERRED_EIP" ]; then
+                SELECTED_ALLOC="$alloc"
+                SELECTED_IP="$ip"
+                break
+              fi
+            done
+          fi
+
+          # 3) Fallback: first tagged EIP
+          if [ -z "$SELECTED_ALLOC" ] && [ ${#EIP_LINES[@]} -gt 0 ]; then
+            SELECTED_ALLOC=$(awk '{print $1}' <<< "${EIP_LINES[0]}")
+            SELECTED_IP=$(awk '{print $2}' <<< "${EIP_LINES[0]}")
+          fi
+
+          if [ -n "$SELECTED_ALLOC" ]; then
+            echo "Selected reusable EIP: $SELECTED_IP ($SELECTED_ALLOC)"
+            echo "RECOVERY_EIP_ALLOCATION_ID=$SELECTED_ALLOC" >> "$GITHUB_ENV"
+            echo "RECOVERY_EIP_PUBLIC_IP=$SELECTED_IP" >> "$GITHUB_ENV"
+          else
+            echo "No reusable EIP found. Terraform will allocate one."
+          fi
+
+          # Optional cleanup: release duplicate unassociated tagged EIPs
+          for line in "${EIP_LINES[@]:-}"; do
+            alloc=$(awk '{print $1}' <<< "$line")
+            assoc=$(awk '{print $3}' <<< "$line")
+            if [ "$alloc" != "$SELECTED_ALLOC" ] && [ "$assoc" = "None" ]; then
+              echo "Releasing duplicate unassociated EIP: $alloc"
+              aws ec2 release-address --allocation-id "$alloc" || true
+            fi
+          done
+
       - name: 🔧 Terraform Init
         working-directory: terraform
         run: terraform init
 
-      - name: 🚀 Terraform Apply (fresh infrastructure)
+      - name: 🚀 Terraform Apply (reuse EIP when available)
         working-directory: terraform
-        run: terraform apply -auto-approve
+        run: |
+          set -euo pipefail
+          if [ -n "${RECOVERY_EIP_ALLOCATION_ID:-}" ]; then
+            terraform apply -auto-approve -var="existing_eip_allocation_id=${RECOVERY_EIP_ALLOCATION_ID}"
+          else
+            terraform apply -auto-approve
+          fi
 
       - name: 📋 Get outputs
         id: tf
@@ -98,30 +145,16 @@ jobs:
           terraform output -raw ssh_private_key > /tmp/ssh_key.pem
           chmod 600 /tmp/ssh_key.pem
 
-      # ============================================
-      # STEP 3: Update GitHub Secrets with new creds
-      # This ensures CI/CD pipeline uses the correct
-      # SSH key and IP after infrastructure recreation
-      # ============================================
       - name: 🔑 Update GitHub Secrets with new credentials
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
           SERVER_IP: ${{ steps.tf.outputs.server_ip }}
         run: |
-          echo "=== Updating SERVER_HOST secret ==="
+          set -euo pipefail
           echo -n "$SERVER_IP" | gh secret set SERVER_HOST --repo ${{ github.repository }}
-          echo "✅ SERVER_HOST updated to $SERVER_IP"
-
-          echo "=== Updating SSH_PRIVATE_KEY secret ==="
           cd terraform
           terraform output -raw ssh_private_key | gh secret set SSH_PRIVATE_KEY --repo ${{ github.repository }}
-          echo "✅ SSH_PRIVATE_KEY updated"
-
-          echo "=== Verifying SERVER_USER ==="
           echo -n "ec2-user" | gh secret set SERVER_USER --repo ${{ github.repository }}
-          echo "✅ SERVER_USER confirmed as ec2-user"
-
-          echo "=== All GitHub Secrets updated successfully ==="
 
       - name: ⏳ Wait for instance boot (90s)
         run: sleep 90
@@ -129,28 +162,41 @@ jobs:
       - name: 🚀 Deploy Application
         env:
           SERVER_IP: ${{ steps.tf.outputs.server_ip }}
+          GRAFANA_USER: ${{ secrets.GRAFANA_ADMIN_USER }}
+          GRAFANA_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
         run: |
-          # Use the SSH key from Terraform output directly
-          ssh -i /tmp/ssh_key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 ec2-user@$SERVER_IP << 'DEPLOY_EOF'
-          set -e
-          echo "=== Checking Docker ==="
-          docker --version
-          docker compose version
+          set -euo pipefail
+          : "${GRAFANA_USER:=admin}"
+          : "${GRAFANA_PASSWORD:=admin}"
 
-          echo "=== Cloning repository ==="
+          ssh -i /tmp/ssh_key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 ec2-user@$SERVER_IP \
+            GRAFANA_USER="$GRAFANA_USER" GRAFANA_PASSWORD="$GRAFANA_PASSWORD" 'bash -s' << 'DEPLOY_EOF'
+          set -euo pipefail
+
+          # Safety: bootstrap tools if cloud-init did not finish package install yet
+          if ! command -v git >/dev/null 2>&1; then
+            sudo yum install -y git
+          fi
+          if ! command -v docker >/dev/null 2>&1; then
+            sudo yum install -y docker
+            sudo systemctl enable --now docker
+            sudo usermod -aG docker ec2-user
+          fi
+
           sudo mkdir -p /opt/health-dashboard
           sudo chown ec2-user:ec2-user /opt/health-dashboard
           cd /opt/health-dashboard
 
           if [ -d ".git" ]; then
             git config --global --add safe.directory /opt/health-dashboard
-            git pull origin main
+            git fetch origin
+            git checkout main
+            git reset --hard origin/main
           else
             git clone https://github.com/zaburdaev/my-devops-project.git .
           fi
 
-          echo "=== Creating .env ==="
-          cat > .env << 'ENVEOF'
+          cat > .env << ENVEOF
           POSTGRES_DB=health_dashboard
           POSTGRES_USER=postgres
           POSTGRES_PASSWORD=postgres123
@@ -158,44 +204,26 @@ jobs:
           REDIS_URL=redis://redis:6379/0
           SECRET_KEY=dev-secret-key-change-in-production
           FLASK_ENV=production
-          GRAFANA_ADMIN_USER=admin
-          GRAFANA_ADMIN_PASSWORD=admin
+          GF_SECURITY_ADMIN_USER=$GRAFANA_USER
+          GF_SECURITY_ADMIN_PASSWORD=$GRAFANA_PASSWORD
           ENVEOF
 
-          echo "=== Starting containers ==="
-          docker compose pull --ignore-buildable 2>&1 || true
+          docker compose pull --ignore-buildable || true
           docker compose up -d --build --force-recreate
-
-          echo "=== Waiting for startup (30s) ==="
           sleep 30
 
-          echo "=== Configuring Grafana ==="
-          bash scripts/configure_grafana.sh || true
-
-          echo "=== Container status ==="
+          GRAFANA_ENV_FILE=/opt/health-dashboard/.env bash scripts/configure_grafana.sh || true
           docker compose ps
-
-          echo "✅ Recovery deployment complete!"
           DEPLOY_EOF
 
       - name: ✅ Verify services
         env:
           SERVER_IP: ${{ steps.tf.outputs.server_ip }}
         run: |
-          echo "=== Verifying services ==="
-          echo "Nginx:"
-          curl -sf --max-time 10 http://$SERVER_IP | grep -o "<title>.*</title>" || echo "⚠️ Nginx not ready"
-          echo ""
-          echo "Grafana:"
-          curl -sf --max-time 10 http://$SERVER_IP:3000/api/health || echo "⚠️ Grafana not ready"
-          echo ""
-          echo "Prometheus:"
-          curl -sf --max-time 10 http://$SERVER_IP:9090/-/healthy || echo "⚠️ Prometheus not ready"
-          echo ""
-          echo "=== ✅ Infrastructure recovered at: $SERVER_IP ==="
-          echo "App:        http://$SERVER_IP"
-          echo "Grafana:    http://$SERVER_IP:3000"
-          echo "Prometheus: http://$SERVER_IP:9090"
+          echo "=== Verifying services on $SERVER_IP ==="
+          curl -sf --max-time 10 http://$SERVER_IP/health || true
+          curl -sf --max-time 10 http://$SERVER_IP:3000/api/health || true
+          curl -sf --max-time 10 http://$SERVER_IP:9090/-/healthy || true
 
       - name: 🧹 Cleanup
         if: always()

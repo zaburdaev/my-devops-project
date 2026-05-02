@@ -26,3 +26,9 @@ variable "allowed_ssh_cidr" {
   type        = string
   default     = "0.0.0.0/0"
 }
+
+variable "existing_eip_allocation_id" {
+  description = "Optional existing Elastic IP allocation ID to reuse (for stateless recovery runs)."
+  type        = string
+  default     = ""
+}

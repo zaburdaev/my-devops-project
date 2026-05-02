@@ -3,7 +3,7 @@
 ## Полное руководство по инфраструктуре с постоянным IP
 
 **Автор:** Vitalii Zaburdaiev | DevOpsUA6  
-**IP-адрес (постоянный):** `52.59.86.193`  
+**IP-адрес (постоянный):** `18.197.7.122`  
 **Регион AWS:** eu-central-1 (Франкфурт)  
 **Статус:** ✅ Всё работает, IP защищён от изменений
 
@@ -27,15 +27,15 @@
 
 | Сервис | URL | Описание |
 |--------|-----|----------|
-| 🌐 **Приложение** | http://52.59.86.193 | Health Dashboard (Flask) |
-| 💚 **Health Check** | http://52.59.86.193/health | JSON-статус приложения |
-| 📊 **Grafana** | http://52.59.86.193:3000 | Дашборды мониторинга |
-| 🔥 **Prometheus** | http://52.59.86.193:9090 | Метрики и алерты |
+| 🌐 **Приложение** | http://18.197.7.122 | Health Dashboard (Flask) |
+| 💚 **Health Check** | http://18.197.7.122/health | JSON-статус приложения |
+| 📊 **Grafana** | http://18.197.7.122:3000 | Дашборды мониторинга |
+| 🔥 **Prometheus** | http://18.197.7.122:9090 | Метрики и алерты |
 
 ### SSH-доступ к серверу
 
 ```bash
-ssh -i terraform/my-devops-key.pem ec2-user@52.59.86.193
+ssh -i terraform/my-devops-key.pem ec2-user@18.197.7.122
 ```
 
 ### Деплой нового кода
@@ -50,7 +50,7 @@ git push origin main
 
 ```
 GitHub → Actions → Infrastructure Recovery → Run workflow
-# → Сервер пересоздастся, IP останется 52.59.86.193
+# → Сервер пересоздастся, IP останется 18.197.7.122
 ```
 
 ---
@@ -61,7 +61,7 @@ GitHub → Actions → Infrastructure Recovery → Run workflow
 
 | Параметр | Значение |
 |----------|----------|
-| **IP-адрес** | `52.59.86.193` (Elastic IP, постоянный) |
+| **IP-адрес** | `18.197.7.122` (Elastic IP, постоянный) |
 | **Инстанс** | EC2 `t2.micro` (Free Tier) |
 | **ОС** | Amazon Linux 2023 |
 | **Регион** | eu-central-1 (Франкфурт) |
@@ -112,7 +112,7 @@ GitHub → Actions → Infrastructure Recovery → Run workflow
 | `DOCKER_USERNAME` | Логин Docker Hub |
 | `DOCKER_PASSWORD` | Пароль Docker Hub |
 | `SSH_PRIVATE_KEY` | Приватный SSH-ключ для EC2 |
-| `SERVER_IP` | `52.59.86.193` |
+| `SERVER_IP` | `18.197.7.122` |
 
 ---
 
@@ -129,7 +129,7 @@ GitHub → Actions → Infrastructure Recovery → Run workflow
 ═══════                    ═════════════════                    ═════════
 
 EC2 умер          ┌─────────────────────────┐
-или удалён ──────▶│ 1. Cleanup              │          IP: 52.59.86.193
+или удалён ──────▶│ 1. Cleanup              │          IP: 18.197.7.122
                   │    Удаляет ТОЛЬКО:       │          ══════════════════
                   │    - EC2 instance        │          НЕ МЕНЯЕТСЯ!
                   │    - Key Pair            │
@@ -215,7 +215,7 @@ Recovery pipeline **НЕ удаляет:**
 2. Импортирует его в новый Terraform state
 3. Привязывает к новому EC2 инстансу
 
-**Результат:** IP `52.59.86.193` остаётся постоянным при любом количестве Recovery.
+**Результат:** IP `18.197.7.122` остаётся постоянным при любом количестве Recovery.
 
 ---
 
@@ -278,11 +278,11 @@ Recovery pipeline **НЕ удаляет:**
 
 ## 🔧 Troubleshooting
 
-### Приложение недоступно (http://52.59.86.193 не открывается)
+### Приложение недоступно (http://18.197.7.122 не открывается)
 
 ```bash
 # 1. Проверить, что EC2 работает
-ssh -i terraform/my-devops-key.pem ec2-user@52.59.86.193
+ssh -i terraform/my-devops-key.pem ec2-user@18.197.7.122
 
 # 2. Проверить Docker-контейнеры
 sudo docker ps
@@ -302,7 +302,7 @@ sudo docker compose up -d
 chmod 600 terraform/my-devops-key.pem
 
 # Попробовать подключиться с отладкой
-ssh -vvv -i terraform/my-devops-key.pem ec2-user@52.59.86.193
+ssh -vvv -i terraform/my-devops-key.pem ec2-user@18.197.7.122
 ```
 
 ### Grafana не открывается
@@ -331,7 +331,7 @@ sudo docker compose restart grafana
 |--------|---------|
 | AWS credentials error | Проверить `AWS_ACCESS_KEY_ID` и `AWS_SECRET_ACCESS_KEY` |
 | Terraform apply failed | Проверить лимиты AWS (max EC2 instances) |
-| EIP not found | Проверить что EIP `52.59.86.193` существует в AWS Console |
+| EIP not found | Проверить что EIP `18.197.7.122` существует в AWS Console |
 | Ansible failed | Подождать 2-3 минуты после создания EC2, перезапустить workflow |
 
 ### IP изменился (теоретически невозможно, но если всё же)
@@ -351,9 +351,9 @@ aws ec2 describe-addresses --filters "Name=tag:Name,Values=health-dashboard-eip"
 
 ```bash
 # Быстрая проверка всех сервисов
-curl -s http://52.59.86.193/health | python3 -m json.tool
-curl -s -o /dev/null -w "%{http_code}" http://52.59.86.193:3000/
-curl -s -o /dev/null -w "%{http_code}" http://52.59.86.193:9090/
+curl -s http://18.197.7.122/health | python3 -m json.tool
+curl -s -o /dev/null -w "%{http_code}" http://18.197.7.122:3000/
+curl -s -o /dev/null -w "%{http_code}" http://18.197.7.122:9090/
 ```
 
 ---
@@ -374,4 +374,4 @@ curl -s -o /dev/null -w "%{http_code}" http://52.59.86.193:9090/
 ---
 
 *Последнее обновление: Май 2026*  
-*Постоянный IP: 52.59.86.193 — защищён prevent_destroy*
+*Постоянный IP: 18.197.7.122 — защищён prevent_destroy*

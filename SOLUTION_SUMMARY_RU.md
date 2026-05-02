@@ -20,7 +20,7 @@
 ```
 Recovery #1: 3.120.45.67     ← первый IP
 Recovery #2: 18.196.22.111   ← новый IP!
-Recovery #3: 52.59.86.193    ← опять новый!
+Recovery #3: 18.197.7.122    ← опять новый!
 ```
 
 ### Почему это плохо
@@ -111,9 +111,9 @@ resource "aws_eip" "app_ip" {
 ```
 ╔══════════════════════════════════════════════╗
 ║                                              ║
-║   IP-АДРЕС:  52.59.86.193                    ║
+║   IP-АДРЕС:  18.197.7.122                    ║
 ║   СТАТУС:    ✅ Постоянный (prevent_destroy)  ║
-║   СЕРВИС:    http://52.59.86.193:3000        ║
+║   СЕРВИС:    http://18.197.7.122:3000        ║
 ║   РЕГИОН:    eu-central-1 (Франкфурт)        ║
 ║                                              ║
 ║   Этот IP НЕ ИЗМЕНИТСЯ при Recovery!         ║
@@ -130,14 +130,14 @@ resource "aws_eip" "app_ip" {
 ```bash
 # 1. Проверить текущий IP
 terraform output app_public_ip
-# Ожидаем: 52.59.86.193
+# Ожидаем: 18.197.7.122
 
 # 2. Проверить что prevent_destroy работает
 terraform plan -destroy
 # Ожидаем: ошибку для aws_eip.app_ip
 
 # 3. Проверить что EIP существует в AWS
-aws ec2 describe-addresses --public-ips 52.59.86.193
+aws ec2 describe-addresses --public-ips 18.197.7.122
 # Ожидаем: JSON с информацией об EIP
 ```
 
@@ -147,8 +147,8 @@ aws ec2 describe-addresses --public-ips 52.59.86.193
 2. Нажать **"Run workflow"**
 3. Дождаться завершения (~18 мин)
 4. Проверить:
-   - `http://52.59.86.193:3000` — приложение доступно
-   - IP не изменился — `52.59.86.193`
+   - `http://18.197.7.122:3000` — приложение доступно
+   - IP не изменился — `18.197.7.122`
 
 ### Ручной тест (локально)
 
@@ -162,7 +162,7 @@ terraform state rm aws_eip.app_ip
 terraform destroy -auto-approve
 
 # Шаг 3: Проверить — EIP всё ещё существует в AWS!
-aws ec2 describe-addresses --public-ips 52.59.86.193
+aws ec2 describe-addresses --public-ips 18.197.7.122
 
 # Шаг 4: Импортировать EIP обратно
 terraform import aws_eip.app_ip <eip-alloc-id>
@@ -172,7 +172,7 @@ terraform apply -auto-approve
 
 # Шаг 6: Проверить — IP тот же!
 terraform output app_public_ip
-# → 52.59.86.193 ✅
+# → 18.197.7.122 ✅
 ```
 
 ---
@@ -200,7 +200,7 @@ Recovery Pipeline (обновлённый)
 ├── 7. Terraform Apply (новый EC2 + привязка EIP)
 ├── 8. Setup Ansible
 ├── 9. Ansible Provisioning
-└── 10. Health Check (http://52.59.86.193:3000)
+└── 10. Health Check (http://18.197.7.122:3000)
 ```
 
 ---
@@ -227,7 +227,7 @@ Recovery Pipeline (обновлённый)
      │              AWS (eu-central-1)              │
      │                                              │
      │  ┌─────────────────────────────────────┐     │
-     │  │  Elastic IP: 52.59.86.193           │     │
+     │  │  Elastic IP: 18.197.7.122           │     │
      │  │  🔒 prevent_destroy = true          │     │
      │  │  Статус: ПОСТОЯННЫЙ                 │     │
      │  └──────────────┬──────────────────────┘     │
@@ -273,10 +273,10 @@ Recovery Pipeline (обновлённый)
 
 | Было | Стало |
 |------|-------|
-| ❌ IP менялся при каждом recovery | ✅ IP **52.59.86.193** постоянный |
+| ❌ IP менялся при каждом recovery | ✅ IP **18.197.7.122** постоянный |
 | ❌ Нужно обновлять DNS после recovery | ✅ DNS не нужно трогать |
 | ❌ Все клиенты теряли доступ | ✅ Клиенты продолжают работать |
 | ❌ EIP удалялся с `terraform destroy` | ✅ EIP защищён `prevent_destroy` |
 | ❌ Recovery ~30 мин (с обновлением DNS) | ✅ Recovery ~18 мин (без обновления) |
 
-> **🎯 Задача решена:** IP-адрес `52.59.86.193` теперь **постоянный** и **не изменится** при Recovery.
+> **🎯 Задача решена:** IP-адрес `18.197.7.122` теперь **постоянный** и **не изменится** при Recovery.

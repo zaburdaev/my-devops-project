@@ -11,8 +11,8 @@
 
 1. Go to: https://github.com/zaburdaev/my-devops-project/settings/secrets/actions
 2. Click "Edit" on `SERVER_HOST` secret
-3. Change value from: `52.59.86.193`
-4. Change to: `52.59.86.193`
+3. Change value from: `18.197.7.122`
+4. Change to: `18.197.7.122`
 5. Click "Update secret"
 
 **✅ DONE!** Your CI/CD can now deploy correctly.
@@ -28,11 +28,11 @@
 │ Instance ID: i-059c8320d831be2bf        │
 │ Instance Type: t2.micro (Amazon Linux)  │
 │                                          │
-│ Elastic IP:  52.59.86.193  ✅ ACTIVE │
+│ Elastic IP:  18.197.7.122  ✅ ACTIVE │
 │ Allocation:  eipalloc-0f1d885679fa634f8│
 │ Region:      eu-central-1 (Frankfurt)   │
 │                                          │
-│ OLD IP:      52.59.86.193     ❌ LOST │
+│ OLD IP:      18.197.7.122     ❌ LOST │
 │ Status:      Released to AWS pool       │
 │              Cannot be recovered        │
 └─────────────────────────────────────────┘
@@ -53,7 +53,7 @@ resource "aws_eip" "app_eip" {
 }
 ```
 
-### Can You Get 52.59.86.193 Back?
+### Can You Get 18.197.7.122 Back?
 **NO. ❌** AWS doesn't allow:
 - Requesting specific IP addresses
 - "Recovering" released IPs
@@ -64,7 +64,7 @@ resource "aws_eip" "app_eip" {
 ### Solutions
 
 #### ✅ **OPTION 1: USE NEW IP (RECOMMENDED)**
-- Keep: 52.59.86.193
+- Keep: 18.197.7.122
 - Update GitHub Secrets (see above)
 - Update documentation
 - **Downtime:** 0 minutes
@@ -166,7 +166,7 @@ rm -rf ansible/
 ## 📊 What Needs Updating
 
 ### GitHub Secrets (CRITICAL) ⚠️
-- [ ] `SERVER_HOST`: 52.59.86.193 → **52.59.86.193**
+- [ ] `SERVER_HOST`: 18.197.7.122 → **18.197.7.122**
 
 ### Documentation Files (Non-Critical) 📚
 Found 110+ references to old IP in:
@@ -181,7 +181,7 @@ Found 110+ references to old IP in:
 **Quick fix (Linux/Mac):**
 ```bash
 cd /home/ubuntu/my-devops-project
-find . -type f \( -name "*.md" -o -name "*.txt" \) -exec sed -i 's/3\.127\.155\.114/52.59.86.193/g' {} \;
+find . -type f \( -name "*.md" -o -name "*.txt" \) -exec sed -i 's/3\.127\.155\.114/18.197.7.122/g' {} \;
 ```
 
 ---
@@ -189,7 +189,7 @@ find . -type f \( -name "*.md" -o -name "*.txt" \) -exec sed -i 's/3\.127\.155\.
 ## ✅ Next Steps
 
 **Immediate (Required):**
-1. Update GitHub Secrets: `SERVER_HOST = 52.59.86.193`
+1. Update GitHub Secrets: `SERVER_HOST = 18.197.7.122`
 
 **Short-term (Recommended):**
 2. Update documentation references (run sed command above)

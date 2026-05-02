@@ -52,23 +52,23 @@
 │  Recovery #1:                                                        │
 │  ├── Удалить ресурсы КРОМЕ Elastic IP                               │
 │  ├── Terraform переиспользует СУЩЕСТВУЮЩИЙ EIP                      │
-│  ├── Результат: IP = 52.59.86.193  ← ТОТ ЖЕ                       │
+│  ├── Результат: IP = 18.197.7.122  ← ТОТ ЖЕ                       │
 │  └── ✅ SERVER_HOST не нужно менять                                  │
 │                                                                      │
 │  Recovery #2:                                                        │
 │  ├── Удалить ресурсы КРОМЕ Elastic IP                               │
 │  ├── Terraform переиспользует СУЩЕСТВУЮЩИЙ EIP                      │
-│  ├── Результат: IP = 52.59.86.193  ← ТОТ ЖЕ                       │
+│  ├── Результат: IP = 18.197.7.122  ← ТОТ ЖЕ                       │
 │  └── ✅ SERVER_HOST не нужно менять                                  │
 │                                                                      │
 │  Recovery #3:                                                        │
 │  ├── Удалить ресурсы КРОМЕ Elastic IP                               │
 │  ├── Terraform переиспользует СУЩЕСТВУЮЩИЙ EIP                      │
-│  ├── Результат: IP = 52.59.86.193  ← ТОТ ЖЕ                       │
+│  ├── Результат: IP = 18.197.7.122  ← ТОТ ЖЕ                       │
 │  └── ✅ SERVER_HOST не нужно менять                                  │
 │                                                                      │
 │  Результат:                                                          │
-│  • IP всегда 52.59.86.193                                           │
+│  • IP всегда 18.197.7.122                                           │
 │  • Закладки и ссылки работают                                       │
 │  • CI/CD продолжает работать                                        │
 │  • DNS не нужно обновлять                                           │
@@ -174,7 +174,7 @@ terraform state show aws_eip.app_eip
 resource "aws_eip" "app_eip" {
     allocation_id     = "eipalloc-04509284aae88c6a3"
     domain            = "vpc"
-    public_ip         = "52.59.86.193"
+    public_ip         = "18.197.7.122"
     ...
 }
 ```
@@ -214,7 +214,7 @@ aws ec2 describe-addresses \
 ------------------------------------------------------------
 |                    DescribeAddresses                      |
 +----------------+---------------------------+--------------+
-|  52.59.86.193  |  eipalloc-04509284aae...  |  i-08c0b... |
+|  18.197.7.122  |  eipalloc-04509284aae...  |  i-08c0b... |
 +----------------+---------------------------+--------------+
 ```
 
@@ -228,15 +228,15 @@ aws ec2 describe-addresses \
 
 ```bash
 # Приложение
-curl -sf http://52.59.86.193 | grep -o "<title>.*</title>"
+curl -sf http://18.197.7.122 | grep -o "<title>.*</title>"
 # Ожидание: <title>Health Dashboard</title>
 
 # Grafana
-curl -sf http://52.59.86.193:3000/api/health
+curl -sf http://18.197.7.122:3000/api/health
 # Ожидание: {"commit":"...","database":"ok","version":"..."}
 
 # Prometheus
-curl -sf http://52.59.86.193:9090/-/healthy
+curl -sf http://18.197.7.122:9090/-/healthy
 # Ожидание: Prometheus Server is Healthy.
 ```
 
@@ -253,7 +253,7 @@ curl -sf http://52.59.86.193:9090/-/healthy
 | 3 | terraform.tfstate | ✅ | EIP записан в state с правильным IP |
 | 4 | Recovery Workflow | ✅ | Workflow не содержит команд удаления EIP |
 | 5 | AWS State | ✅ | EIP существует и привязан к инстансу |
-| 6 | Доступность | ✅ | Все сервисы отвечают по 52.59.86.193 |
+| 6 | Доступность | ✅ | Все сервисы отвечают по 18.197.7.122 |
 
 ---
 

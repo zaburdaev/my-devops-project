@@ -2,7 +2,7 @@
 
 **Автор:** Vitalii Zaburdaiev  
 **Проект:** Health Dashboard | DevOpsUA6  
-**Постоянный IP:** `52.59.86.193` (Persistent Elastic IP — не меняется при recovery)  
+**Постоянный IP:** `18.197.7.122` (Persistent Elastic IP — не меняется при recovery)  
 **EC2 Instance:** `i-08c0b5da779c84e57`  
 **EIP Allocation ID:** `eipalloc-04509284aae88c6a3`
 
@@ -122,7 +122,7 @@ deploy:
 4. **Динамический inventory** — генерируем файл `inventory.ini` с актуальным IP сервера:
    ```ini
    [webservers]
-   production ansible_host=52.59.86.193 ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/deploy_key
+   production ansible_host=18.197.7.122 ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/deploy_key
    ```
 5. **Ansible Playbook** — запускаем плейбук, который:
    - Устанавливает Docker (если не установлен)
@@ -189,7 +189,7 @@ Developer pushes code
 
 - Запускается **вручную** (кнопка "Run workflow" в GitHub Actions)
 - **Пересоздаёт** EC2, Key Pair, Security Group
-- **Elastic IP сохраняется** — IP `52.59.86.193` остаётся постоянным (не удаляется и не пересоздаётся)
+- **Elastic IP сохраняется** — IP `18.197.7.122` остаётся постоянным (не удаляется и не пересоздаётся)
 - `SERVER_HOST` в GitHub Secrets **не нужно обновлять** — IP не меняется
 - Подробнее: см. `docs/PERSISTENT_IP_GUIDE_RU.md`
 
@@ -219,7 +219,7 @@ Developer pushes code
 ├── Создаёт Security Group (порты 22,80,443,3000,5000,9090)
 ├── Создаёт EC2 Instance (Amazon Linux 2023, t3.micro)
 │   └── user_data: установка Docker, Docker Compose
-├── ♻️ Переиспользует Elastic IP (52.59.86.193 — persistent)
+├── ♻️ Переиспользует Elastic IP (18.197.7.122 — persistent)
 └── Привязывает существующий EIP к новому EC2
 ```
 
@@ -295,7 +295,7 @@ Admin clicks "Run workflow"
          │
          ▼
   ✅ IP не изменился!
-  SERVER_HOST = 52.59.86.193
+  SERVER_HOST = 18.197.7.122
   (обновляется автоматически)
 ```
 
@@ -341,7 +341,7 @@ terraform/
 │  └──────────────┬──────────────────────┘                    │
 │                 │                                            │
 │  ┌──────────────▼──────────────────────┐                    │
-│  │ Elastic IP: 52.59.86.193          │                    │
+│  │ Elastic IP: 18.197.7.122          │                    │
 │  │  (привязан к EC2)                   │                    │
 │  └─────────────────────────────────────┘                    │
 │                                                             │
@@ -548,7 +548,7 @@ post_tasks
 
 | Секрет | Описание | Пример |
 |--------|----------|--------|
-| `SERVER_HOST` | IP сервера | `52.59.86.193` |
+| `SERVER_HOST` | IP сервера | `18.197.7.122` |
 | `SERVER_USER` | SSH пользователь | `ec2-user` |
 | `SSH_PRIVATE_KEY` | Приватный SSH ключ | Содержимое `.pem` файла |
 | `DOCKER_USERNAME` | Docker Hub логин | `zaburdaev` |
@@ -601,7 +601,7 @@ IP **не меняется** благодаря Persistent Elastic IP. Workflow 
                                    │
                                    ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                    AWS EC2: 52.59.86.193                                │
+│                    AWS EC2: 18.197.7.122                                │
 │                                                                          │
 │  ┌──────────────────────────────────────────────────────────────────┐    │
 │  │                    DOCKER COMPOSE                                │    │

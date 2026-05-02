@@ -181,10 +181,10 @@ After a few minutes, Terraform will output:
 ```
 Outputs:
 instance_id = "i-0abc123def456..."
-instance_public_ip = "52.59.86.193"
-app_url = "http://52.59.86.193"
-grafana_url = "http://52.59.86.193:3000"
-prometheus_url = "http://52.59.86.193:9090"
+instance_public_ip = "18.197.7.122"
+app_url = "http://18.197.7.122"
+grafana_url = "http://18.197.7.122:3000"
+prometheus_url = "http://18.197.7.122:9090"
 ```
 
 ### Step 6: Get the Server IP

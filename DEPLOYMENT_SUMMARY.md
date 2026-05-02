@@ -10,17 +10,17 @@
 | EC2 Instance ID | `i-0c4b446783b0704eb` |
 | Region | `eu-central-1` |
 | Instance Type | `t3.micro` |
-| Elastic IP (Static) | `52.59.86.193` |
+| Elastic IP (Static) | `18.197.7.122` |
 | Security Group | `health-dashboard-sg` (22, 80, 443, 5000, 3000, 9090) |
 
 > Use **Elastic IP** in docs/secrets and service links. This IP stays stable while the EIP resource remains allocated.
 
 ## 🌐 Current Service URLs
 
-- Health Dashboard: http://52.59.86.193
-- Flask health endpoint: http://52.59.86.193:5000/health
-- Grafana: http://52.59.86.193:3000
-- Prometheus: http://52.59.86.193:9090
+- Health Dashboard: http://18.197.7.122
+- Flask health endpoint: http://18.197.7.122:5000/health
+- Grafana: http://18.197.7.122:3000
+- Prometheus: http://18.197.7.122:9090
 
 ## 🔐 GitHub Secrets (Required)
 
@@ -28,7 +28,7 @@
 - `AWS_SECRET_ACCESS_KEY`
 - `SSH_PRIVATE_KEY`
 - `SERVER_USER=ec2-user`
-- `SERVER_HOST=52.59.86.193`
+- `SERVER_HOST=18.197.7.122`
 
 ## ♻️ Infrastructure Recovery Workflow
 
@@ -58,9 +58,9 @@ Verified outcome:
 
 Executed `./verify_services.sh` successfully:
 
-- ✅ `http://52.59.86.193:5000/health`
-- ✅ `http://52.59.86.193:9090/-/healthy`
-- ✅ `http://52.59.86.193:3000/api/health`
+- ✅ `http://18.197.7.122:5000/health`
+- ✅ `http://18.197.7.122:9090/-/healthy`
+- ✅ `http://18.197.7.122:3000/api/health`
 
 ## 📄 Related Summary
 

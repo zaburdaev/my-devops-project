@@ -26,7 +26,7 @@
 
 ```
 TASK [app : Configure Grafana dashboard] **************************************
-fatal: [52.59.86.193]: FAILED! => {
+fatal: [18.197.7.122]: FAILED! => {
     "changed": false,
     "msg": "Failed to configure Grafana: Error: HTTP 401 Unauthorized"
 }
@@ -371,7 +371,7 @@ GitHub Push
 
 ### 🌐 Доступ к Grafana
 
-**URL:** http://52.59.86.193:3000
+**URL:** http://18.197.7.122:3000
 
 **Учетные данные:**
 - Username: `grafana_admin`
@@ -387,13 +387,13 @@ GitHub Push
 
 ```bash
 # Проверка здоровья Grafana
-curl -f http://52.59.86.193:3000/api/health
+curl -f http://18.197.7.122:3000/api/health
 
 # Проверка аутентификации
-curl -u grafana_admin:admin_password http://52.59.86.193:3000/api/org
+curl -u grafana_admin:admin_password http://18.197.7.122:3000/api/org
 
 # Проверка списка dashboards
-curl -u grafana_admin:admin_password http://52.59.86.193:3000/api/search
+curl -u grafana_admin:admin_password http://18.197.7.122:3000/api/search
 ```
 
 ---
@@ -417,7 +417,7 @@ curl -u grafana_admin:admin_password http://52.59.86.193:3000/api/search
    - Убедитесь, что задача "Configure Grafana dashboard" завершилась без ошибок
 
 4. **Проверьте Grafana:**
-   - Откройте http://52.59.86.193:3000
+   - Откройте http://18.197.7.122:3000
    - Войдите с credentials: grafana_admin / admin_password
    - Убедитесь, что dashboard "Health Monitoring Dashboard" присутствует
 

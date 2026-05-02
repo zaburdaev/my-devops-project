@@ -11,7 +11,7 @@
 - **6 сервисов в Docker Compose**: `app`, `postgres`, `redis`, `nginx`, `prometheus`, `grafana`
 - **Loki удалён** из runtime-конфигурации (оставлены JSON-логи через `docker compose logs`)
 - **Grafana credentials** берутся из `.env` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`)
-- **Актуальный Elastic IP:** `52.59.86.193`
+- **Актуальный Elastic IP:** `18.197.7.122`
 - **Актуальный scrape/evaluation interval:** `60s`
 
 ## Main Documentation (Core)

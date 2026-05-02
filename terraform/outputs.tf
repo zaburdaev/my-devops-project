@@ -20,22 +20,22 @@ output "instance_public_dns" {
 
 output "elastic_ip" {
   description = "Elastic IP address (static)"
-  value       = aws_eip.app_eip.public_ip
+  value       = local.elastic_ip_public_ip
 }
 
 output "app_url" {
   description = "URL to access the Health Dashboard"
-  value       = "http://${aws_eip.app_eip.public_ip}"
+  value       = "http://${local.elastic_ip_public_ip}"
 }
 
 output "grafana_url" {
   description = "URL to access Grafana"
-  value       = "http://${aws_eip.app_eip.public_ip}:3000"
+  value       = "http://${local.elastic_ip_public_ip}:3000"
 }
 
 output "prometheus_url" {
   description = "URL to access Prometheus"
-  value       = "http://${aws_eip.app_eip.public_ip}:9090"
+  value       = "http://${local.elastic_ip_public_ip}:9090"
 }
 
 output "ssh_private_key" {
@@ -46,5 +46,5 @@ output "ssh_private_key" {
 
 output "ssh_command" {
   description = "SSH command to connect to the server"
-  value       = "ssh -i my-devops-key.pem ec2-user@${aws_eip.app_eip.public_ip}"
+  value       = "ssh -i my-devops-key.pem ec2-user@${local.elastic_ip_public_ip}"
 }

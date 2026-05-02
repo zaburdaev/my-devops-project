@@ -176,11 +176,24 @@ resource "aws_instance" "health_dashboard" {
 }
 
 # ---------- Elastic IP (Static Public IP) ----------
+# Recovery workflow runs on an ephemeral GitHub runner without Terraform state.
+# To prevent creating a new EIP on each recovery run, we can pass an existing
+# allocation ID via `existing_eip_allocation_id` and reuse it.
+locals {
+  use_existing_eip = trimspace(var.existing_eip_allocation_id) != ""
+}
+
+data "aws_eip" "existing" {
+  count = local.use_existing_eip ? 1 : 0
+  id    = var.existing_eip_allocation_id
+}
+
 resource "aws_eip" "app_eip" {
+  count  = local.use_existing_eip ? 0 : 1
   domain = "vpc"
 
   lifecycle {
-    # Critical: keep the same public IP across recovery runs.
+    # Critical: keep the same public IP across recovery runs when this resource is managed by state.
     prevent_destroy = true
 
     # Association is managed by aws_eip_association resource below.
@@ -199,7 +212,12 @@ resource "aws_eip" "app_eip" {
   }
 }
 
+locals {
+  elastic_ip_allocation_id = local.use_existing_eip ? data.aws_eip.existing[0].id : aws_eip.app_eip[0].id
+  elastic_ip_public_ip     = local.use_existing_eip ? data.aws_eip.existing[0].public_ip : aws_eip.app_eip[0].public_ip
+}
+
 resource "aws_eip_association" "app_eip_assoc" {
   instance_id   = aws_instance.health_dashboard.id
-  allocation_id = aws_eip.app_eip.id
+  allocation_id = local.elastic_ip_allocation_id
 }

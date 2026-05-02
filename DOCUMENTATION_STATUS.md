@@ -11,7 +11,7 @@
 ### Проверенные ключевые факты
 
 1. **Infrastructure / Access**
-   - Elastic IP: `52.59.86.193`
+   - Elastic IP: `18.197.7.122`
    - Основные URL и recovery-инструкции актуальны
 
 2. **Compose stack**

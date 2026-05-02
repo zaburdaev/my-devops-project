@@ -33,7 +33,7 @@ sudo: git: command not found
 **Решение:**
 ```bash
 # Подключитесь к серверу
-ssh -i my-devops-key.pem ec2-user@52.59.86.193
+ssh -i my-devops-key.pem ec2-user@18.197.7.122
 
 # Установите git
 sudo dnf install -y git    # Amazon Linux 2023
@@ -137,7 +137,7 @@ Error: Process completed with exit code 1.
 
 **Если проблема повторяется**, выполните вручную:
 ```bash
-ssh -i my-devops-key.pem ec2-user@52.59.86.193
+ssh -i my-devops-key.pem ec2-user@18.197.7.122
 sudo mkdir -p /opt/health-dashboard
 cd /opt
 sudo git clone https://github.com/zaburdaev/my-devops-project.git health-dashboard
@@ -201,7 +201,7 @@ pip freeze | grep -i <package-name>
 **Причина:** Секреты для деплоя не настроены в GitHub.
 
 **Решение:** Добавьте секреты в GitHub → Settings → Secrets and variables → Actions:
-- `SERVER_HOST` — IP адрес сервера (например, `52.59.86.193`)
+- `SERVER_HOST` — IP адрес сервера (например, `18.197.7.122`)
 - `SERVER_USER` — SSH пользователь (`ec2-user`)
 - `SSH_PRIVATE_KEY` — приватный SSH ключ
 
@@ -299,7 +299,7 @@ terraform apply -auto-approve
 
 ### Шаг 1: Подключитесь к серверу
 ```bash
-ssh -i my-devops-key.pem ec2-user@52.59.86.193
+ssh -i my-devops-key.pem ec2-user@18.197.7.122
 ```
 
 ### Шаг 2: Подготовьте директорию
@@ -343,7 +343,7 @@ curl http://localhost/
 
 ### Просмотр логов на сервере
 ```bash
-ssh -i my-devops-key.pem ec2-user@52.59.86.193
+ssh -i my-devops-key.pem ec2-user@18.197.7.122
 
 # Логи Docker контейнеров
 cd /opt/health-dashboard
