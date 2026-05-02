@@ -449,6 +449,9 @@ This project is licensed under the MIT License — see the [LICENSE](./LICENSE) 
 
 ---
 Live demo check 3
+
+<!-- Last updated: 2026-05-02 - Testing Grafana authentication fix (commit f57c189) -->
+
 __
 
 <p align="center">
