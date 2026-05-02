@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>Контейнеризация (Docker)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Merriweather&display=swap');
+.font-lato { font-family: 'Lato', 'Corbel', sans-serif; }
+.font-merriweather { font-family: 'Merriweather', 'Constantia', serif; }
+</style>
+</head>
+<body class="m-0 p-0">
+<div class="relative overflow-hidden w-[1920px] h-[1080px] bg-[#0D1117] flex flex-col">
+
+  <!-- Header -->
+  <div class="flex-none flex flex-row items-center gap-6 px-16 py-8">
+    <div class="bg-[#58A6FF]" style="width:6px; height:50px; border-radius:3px;"></div>
+    <i data-lucide="box" class="w-12 h-12 text-[#58A6FF]"></i>
+    <h1 class="text-6xl font-bold font-lato text-[#E6EDF3] leading-tight">Контейнеризация (Docker)</h1>
+  </div>
+
+  <!-- Body -->
+  <div class="flex-1 min-h-0 grid grid-cols-2 gap-8 px-16 pb-4">
+    <!-- Left: Multi-Stage Dockerfile -->
+    <div class="flex flex-col gap-4">
+      <p class="text-4xl font-bold font-lato text-[#E6EDF3]">Multi-Stage Dockerfile</p>
+      <!-- Stage 1 -->
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <div class="flex-none bg-[#58A6FF] rounded-full flex items-center justify-center" style="width:48px;height:48px;"><p class="text-3xl font-bold text-[#0D1117] font-lato">1</p></div>
+        <div class="flex flex-col gap-1">
+          <p class="text-4xl font-bold text-[#58A6FF] font-lato">Stage 1: Builder</p>
+          <p class="text-3xl text-[#8B949E] font-merriweather">python:3.11-slim — install deps</p>
+        </div>
+      </div>
+      <!-- Arrow -->
+      <div class="flex justify-center"><div class="bg-[#58A6FF]" style="width:3px;height:24px;"></div></div>
+      <!-- Stage 2 -->
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <div class="flex-none bg-[#58A6FF] rounded-full flex items-center justify-center" style="width:48px;height:48px;"><p class="text-3xl font-bold text-[#0D1117] font-lato">2</p></div>
+        <div class="flex flex-col gap-1">
+          <p class="text-4xl font-bold text-[#58A6FF] font-lato">Stage 2: Runtime</p>
+          <p class="text-3xl text-[#8B949E] font-merriweather">Копируем только нужные артефакты</p>
+        </div>
+      </div>
+      <!-- Arrow -->
+      <div class="flex justify-center"><div class="bg-[#58A6FF]" style="width:3px;height:24px;"></div></div>
+      <!-- Result -->
+      <div class="bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <i data-lucide="check-circle-2" class="w-10 h-10 text-[#3FB950]"></i>
+        <div class="flex flex-col gap-1">
+          <p class="text-4xl font-bold text-[#3FB950] font-lato">Result</p>
+          <p class="text-3xl text-[#8B949E] font-merriweather">Минимальный образ, без build-зависимостей</p>
+        </div>
+      </div>
+      <!-- Benefit -->
+      <div class="bg-[#161B22] border border-[#3FB950] rounded-xl p-4 flex flex-row items-center gap-4">
+        <i data-lucide="trending-down" class="w-8 h-8 text-[#3FB950]"></i>
+        <p class="text-3xl font-bold text-[#3FB950] font-lato">Размер образа уменьшен на ~60%</p>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="flex flex-col gap-6">
+      <!-- Docker Compose Services -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-8 flex flex-col gap-4">
+        <p class="text-4xl font-bold font-lato text-[#E6EDF3]">Docker Compose — 7 сервисов</p>
+        <div class="flex flex-row items-center gap-4"><p class="text-3xl font-bold text-[#58A6FF] font-lato">app</p><p class="text-3xl text-[#8B949E] font-merriweather">— Flask Application</p></div>
+        <div class="flex flex-row items-center gap-4"><p class="text-3xl font-bold text-[#58A6FF] font-lato">postgres</p><p class="text-3xl text-[#8B949E] font-merriweather">— Database</p></div>
+        <div class="flex flex-row items-center gap-4"><p class="text-3xl font-bold text-[#58A6FF] font-lato">redis</p><p class="text-3xl text-[#8B949E] font-merriweather">— Cache</p></div>
+        <div class="flex flex-row items-center gap-4"><p class="text-3xl font-bold text-[#58A6FF] font-lato">nginx</p><p class="text-3xl text-[#8B949E] font-merriweather">— Reverse Proxy</p></div>
+        <div class="flex flex-row items-center gap-4"><p class="text-3xl font-bold text-[#58A6FF] font-lato">prometheus</p><p class="text-3xl text-[#8B949E] font-merriweather">— Metrics Collector</p></div>
+        <div class="flex flex-row items-center gap-4"><p class="text-3xl font-bold text-[#58A6FF] font-lato">grafana</p><p class="text-3xl text-[#8B949E] font-merriweather">— Visualization</p></div>
+        <div class="flex flex-row items-center gap-4"><p class="text-3xl font-bold text-[#58A6FF] font-lato">loki</p><p class="text-3xl text-[#8B949E] font-merriweather">— Log Aggregation</p></div>
+      </div>
+      <!-- Best Practices -->
+      <div class="flex-none bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center justify-around">
+        <div class="flex flex-row items-center gap-3"><i data-lucide="shield-check" class="w-8 h-8 text-[#3FB950]"></i><p class="text-3xl text-[#E6EDF3] font-lato">Non-root user</p></div>
+        <div class="flex flex-row items-center gap-3"><i data-lucide="heart-pulse" class="w-8 h-8 text-[#3FB950]"></i><p class="text-3xl text-[#E6EDF3] font-lato">Health checks</p></div>
+        <div class="flex flex-row items-center gap-3"><i data-lucide="lock" class="w-8 h-8 text-[#3FB950]"></i><p class="text-3xl text-[#E6EDF3] font-lato">Secrets via env</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex-none flex flex-row items-center justify-between px-16 py-4 border-t border-[#30363D]">
+    <p class="text-3xl text-[#6E7681] font-lato">DevOpsUA6</p>
+    <p class="text-3xl text-[#6E7681] font-lato">Vitalii Zaburdaiev</p>
+    <p class="text-3xl text-[#6E7681] font-lato">github.com/zaburdaev/my-devops-project</p>
+  </div>
+
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

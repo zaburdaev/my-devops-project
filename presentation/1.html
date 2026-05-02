@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>DevOps Health Monitoring Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Merriweather&display=swap');
+.font-lato { font-family: 'Lato', 'Corbel', sans-serif; }
+.font-merriweather { font-family: 'Merriweather', 'Constantia', serif; }
+</style>
+</head>
+<body class="m-0 p-0">
+<div class="relative overflow-hidden w-[1920px] h-[1080px] bg-[#0D1117] flex flex-col items-center justify-center gap-10">
+
+  <!-- Badge -->
+  <div class="flex-none">
+    <div class="border border-[#58A6FF] rounded-full px-8 py-3">
+      <p class="text-3xl font-lato text-[#58A6FF] uppercase tracking-widest">Final Project Defense</p>
+    </div>
+  </div>
+
+  <!-- Main Title -->
+  <div class="flex-none flex flex-col items-center gap-4">
+    <h1 class="text-9xl font-bold font-lato text-[#E6EDF3] text-center leading-tight">DevOps Health Monitoring</h1>
+    <h1 class="text-9xl font-bold font-lato text-[#E6EDF3] text-center leading-tight">Dashboard</h1>
+    <p class="text-5xl font-merriweather text-[#8B949E] mt-4">my-devops-project</p>
+  </div>
+
+  <!-- Accent Divider -->
+  <div class="flex-none" style="width: 40%;">
+    <div class="border-t border-[#58A6FF]"></div>
+  </div>
+
+  <!-- Metadata Row -->
+  <div class="flex-none flex flex-row items-center justify-center gap-12">
+    <div class="bg-[#161B22] border-t-2 border-[#58A6FF] rounded-lg px-10 py-6 flex flex-col items-center gap-2">
+      <p class="text-3xl text-[#6E7681] font-lato">Author</p>
+      <p class="text-4xl font-bold text-[#E6EDF3] font-lato">Vitalii Zaburdaiev</p>
+    </div>
+    <div class="bg-[#161B22] border-t-2 border-[#58A6FF] rounded-lg px-10 py-6 flex flex-col items-center gap-2">
+      <p class="text-3xl text-[#6E7681] font-lato">Course</p>
+      <p class="text-4xl font-bold text-[#E6EDF3] font-lato">DevOpsUA6</p>
+    </div>
+    <div class="bg-[#161B22] border-t-2 border-[#58A6FF] rounded-lg px-10 py-6 flex flex-col items-center gap-2">
+      <p class="text-3xl text-[#6E7681] font-lato">Date</p>
+      <p class="text-4xl font-bold text-[#E6EDF3] font-lato">April 2026</p>
+    </div>
+  </div>
+
+  <!-- Links Row -->
+  <div class="flex-none flex flex-row items-center justify-center gap-8">
+    <div class="border border-[#58A6FF] rounded-full px-8 py-3 flex flex-row items-center gap-3">
+      <i data-lucide="github" class="w-7 h-7 text-[#8B949E]"></i>
+      <p class="text-3xl text-[#8B949E] font-lato">github.com/zaburdaev/my-devops-project</p>
+    </div>
+    <div class="border border-[#58A6FF] rounded-full px-8 py-3 flex flex-row items-center gap-3">
+      <i data-lucide="box" class="w-7 h-7 text-[#8B949E]"></i>
+      <p class="text-3xl text-[#8B949E] font-lato">oskalibriya/health-dashboard</p>
+    </div>
+  </div>
+
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

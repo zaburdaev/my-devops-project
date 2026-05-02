@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>Мониторинг и логирование</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Merriweather&display=swap');
+.font-lato { font-family: 'Lato', 'Corbel', sans-serif; }
+.font-merriweather { font-family: 'Merriweather', 'Constantia', serif; }
+</style>
+</head>
+<body class="m-0 p-0">
+<div class="relative overflow-hidden w-[1920px] h-[1080px] bg-[#0D1117] flex flex-col">
+
+  <!-- Header -->
+  <div class="flex-none flex flex-row items-center gap-6 px-16 py-8">
+    <div class="bg-[#58A6FF]" style="width:6px; height:50px; border-radius:3px;"></div>
+    <i data-lucide="activity" class="w-12 h-12 text-[#58A6FF]"></i>
+    <h1 class="text-6xl font-bold font-lato text-[#E6EDF3] leading-tight">Мониторинг и логирование</h1>
+  </div>
+
+  <!-- Body -->
+  <div class="flex-1 min-h-0 grid grid-cols-[2fr_3fr] gap-8 px-16 pb-4">
+    <!-- Left: Tool Cards -->
+    <div class="flex flex-col gap-6">
+      <!-- Prometheus -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <i data-lucide="activity" class="w-10 h-10 text-[#58A6FF]"></i>
+        <div>
+          <p class="text-4xl font-bold text-[#E6EDF3] font-lato">Prometheus</p>
+          <p class="text-3xl text-[#58A6FF] font-lato">Сбор метрик</p>
+          <p class="text-3xl text-[#8B949E] font-merriweather">Scrapes /metrics каждые 15 сек</p>
+        </div>
+      </div>
+      <!-- Grafana -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <i data-lucide="bar-chart-2" class="w-10 h-10 text-[#58A6FF]"></i>
+        <div>
+          <p class="text-4xl font-bold text-[#E6EDF3] font-lato">Grafana</p>
+          <p class="text-3xl text-[#58A6FF] font-lato">Визуализация</p>
+          <p class="text-3xl text-[#8B949E] font-merriweather">Дашборды CPU, Memory, HTTP</p>
+        </div>
+      </div>
+      <!-- Loki -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <i data-lucide="file-text" class="w-10 h-10 text-[#58A6FF]"></i>
+        <div>
+          <p class="text-4xl font-bold text-[#E6EDF3] font-lato">Loki</p>
+          <p class="text-3xl text-[#58A6FF] font-lato">Агрегация логов</p>
+          <p class="text-3xl text-[#8B949E] font-merriweather">JSON логи из Flask → Loki → Grafana</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Mock Grafana Dashboard -->
+    <div class="flex flex-col bg-[#161B22] border border-[#30363D] rounded-xl p-6">
+      <p class="text-4xl font-bold text-[#E6EDF3] font-lato mb-4">System Metrics — Last 24h</p>
+      <div class="flex-1 min-h-0 flex items-center justify-center">
+        <canvas id="metricsChart" class="w-full h-full"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex-none flex flex-row items-center justify-between px-16 py-4 border-t border-[#30363D]">
+    <p class="text-3xl text-[#6E7681] font-lato">DevOpsUA6</p>
+    <p class="text-3xl text-[#6E7681] font-lato">Vitalii Zaburdaiev</p>
+    <p class="text-3xl text-[#6E7681] font-lato">github.com/zaburdaev/my-devops-project</p>
+  </div>
+
+</div>
+<script>
+lucide.createIcons();
+new Chart(document.getElementById('metricsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+    datasets: [
+      {
+        label: 'CPU Usage (%)',
+        data: [12, 18, 45, 62, 58, 41, 22],
+        backgroundColor: '#58A6FF',
+        borderColor: '#58A6FF',
+        borderWidth: 1
+      },
+      {
+        label: 'Memory Usage (%)',
+        data: [35, 37, 52, 68, 65, 54, 40],
+        backgroundColor: '#3FB950',
+        borderColor: '#3FB950',
+        borderWidth: 1
+      }
+    ]
+  },
+  options: {
+    animation: false,
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        labels: { color: '#E6EDF3', font: { size: 18 } }
+      },
+      datalabels: false
+    },
+    scales: {
+      x: {
+        ticks: { color: '#8B949E', font: { size: 16 } },
+        grid: { color: '#30363D' }
+      },
+      y: {
+        min: 0,
+        max: 100,
+        title: { display: true, text: 'Usage (%)', color: '#8B949E', font: { size: 16 } },
+        ticks: { color: '#8B949E', font: { size: 16 } },
+        grid: { color: '#30363D' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

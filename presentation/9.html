@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>Kubernetes + Ansible</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Merriweather&display=swap');
+.font-lato { font-family: 'Lato', 'Corbel', sans-serif; }
+.font-merriweather { font-family: 'Merriweather', 'Constantia', serif; }
+</style>
+</head>
+<body class="m-0 p-0">
+<div class="relative overflow-hidden w-[1920px] h-[1080px] bg-[#0D1117] flex flex-col">
+
+  <!-- Header -->
+  <div class="flex-none flex flex-row items-center gap-6 px-16 py-8">
+    <div class="bg-[#58A6FF]" style="width:6px; height:50px; border-radius:3px;"></div>
+    <i data-lucide="cloud" class="w-12 h-12 text-[#58A6FF]"></i>
+    <h1 class="text-6xl font-bold font-lato text-[#E6EDF3] leading-tight">Kubernetes + Ansible</h1>
+  </div>
+
+  <!-- Body -->
+  <div class="flex-1 min-h-0 grid grid-cols-2 gap-8 px-16 pb-4">
+    <!-- Left: Kubernetes -->
+    <div class="flex flex-col gap-5 border-r border-[#30363D] pr-8">
+      <!-- Section Label -->
+      <div class="flex flex-row items-center gap-4">
+        <i data-lucide="cloud" class="w-10 h-10 text-[#58A6FF]"></i>
+        <div><p class="text-5xl font-bold text-[#58A6FF] font-lato">Kubernetes</p><p class="text-3xl text-[#8B949E] font-merriweather">Оркестрация контейнеров</p></div>
+      </div>
+      <!-- Deployment -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <i data-lucide="layers" class="w-8 h-8 text-[#58A6FF]"></i>
+        <div><p class="text-4xl font-bold text-[#E6EDF3] font-lato">Deployment</p><p class="text-3xl text-[#8B949E] font-merriweather">2 реплики, rolling update, liveness/readiness probes</p></div>
+      </div>
+      <!-- Service -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <i data-lucide="globe" class="w-8 h-8 text-[#58A6FF]"></i>
+        <div><p class="text-4xl font-bold text-[#E6EDF3] font-lato">Service</p><p class="text-3xl text-[#8B949E] font-merriweather">ClusterIP для внутренней маршрутизации</p></div>
+      </div>
+      <!-- Helm -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <i data-lucide="package" class="w-8 h-8 text-[#58A6FF]"></i>
+        <div class="flex flex-col gap-1">
+          <div class="flex flex-row items-center gap-3">
+            <p class="text-4xl font-bold text-[#E6EDF3] font-lato">Helm Chart</p>
+            <div class="bg-[#3FB950] rounded-full px-4 py-1"><p class="text-3xl font-bold text-[#0D1117] font-lato">Bonus</p></div>
+          </div>
+          <p class="text-3xl text-[#8B949E] font-merriweather">Параметризованный chart, values.yaml</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Ansible -->
+    <div class="flex flex-col gap-5 pl-8">
+      <!-- Section Label -->
+      <div class="flex flex-row items-center gap-4">
+        <i data-lucide="terminal" class="w-10 h-10 text-[#58A6FF]"></i>
+        <div><p class="text-5xl font-bold text-[#58A6FF] font-lato">Ansible</p><p class="text-3xl text-[#8B949E] font-merriweather">Автоматизация настройки</p></div>
+      </div>
+      <!-- Playbook -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <i data-lucide="settings" class="w-8 h-8 text-[#58A6FF]"></i>
+        <div><p class="text-4xl font-bold text-[#E6EDF3] font-lato">Playbook</p><p class="text-3xl text-[#8B949E] font-merriweather">Установка Docker, настройка окружения, деплой</p></div>
+      </div>
+      <!-- Inventory -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <i data-lucide="users" class="w-8 h-8 text-[#58A6FF]"></i>
+        <div><p class="text-4xl font-bold text-[#E6EDF3] font-lato">Inventory</p><p class="text-3xl text-[#8B949E] font-merriweather">Динамический инвентарь для AWS EC2</p></div>
+      </div>
+      <!-- Idempotency -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-5">
+        <i data-lucide="shield-check" class="w-8 h-8 text-[#58A6FF]"></i>
+        <div><p class="text-4xl font-bold text-[#E6EDF3] font-lato">Idempotency</p><p class="text-3xl text-[#8B949E] font-merriweather">Безопасный повторный запуск без побочных эффектов</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex-none flex flex-row items-center justify-between px-16 py-4 border-t border-[#30363D]">
+    <p class="text-3xl text-[#6E7681] font-lato">DevOpsUA6</p>
+    <p class="text-3xl text-[#6E7681] font-lato">Vitalii Zaburdaiev</p>
+    <p class="text-3xl text-[#6E7681] font-lato">github.com/zaburdaev/my-devops-project</p>
+  </div>
+
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

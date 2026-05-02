@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>Архитектура решения</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Merriweather&display=swap');
+.font-lato { font-family: 'Lato', 'Corbel', sans-serif; }
+.font-merriweather { font-family: 'Merriweather', 'Constantia', serif; }
+</style>
+</head>
+<body class="m-0 p-0">
+<div class="relative overflow-hidden w-[1920px] h-[1080px] bg-[#0D1117] flex flex-col">
+
+  <!-- Header -->
+  <div class="flex-none flex flex-row items-center gap-6 px-16 py-8">
+    <div class="bg-[#58A6FF]" style="width:6px; height:50px; border-radius:3px;"></div>
+    <i data-lucide="network" class="w-12 h-12 text-[#58A6FF]"></i>
+    <h1 class="text-6xl font-bold font-lato text-[#E6EDF3] leading-tight">Архитектура решения</h1>
+  </div>
+
+  <!-- Body -->
+  <div class="flex-1 min-h-0 flex flex-col items-center justify-center px-16 gap-6">
+    <!-- Architecture Diagram -->
+    <div class="flex flex-row items-center justify-center gap-4 w-full">
+
+      <!-- Tier 1: Client -->
+      <div class="flex flex-col items-center gap-3">
+        <p class="text-3xl text-[#8B949E] font-lato">Client</p>
+        <div class="bg-[#161B22] border border-[#30363D] rounded-xl px-8 py-6 flex flex-col items-center gap-2">
+          <i data-lucide="globe" class="w-10 h-10 text-[#58A6FF]"></i>
+          <p class="text-3xl font-bold text-[#E6EDF3] font-lato">Browser / curl</p>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <p class="text-5xl text-[#58A6FF] font-bold">→</p>
+
+      <!-- Tier 2: Gateway -->
+      <div class="flex flex-col items-center gap-3">
+        <p class="text-3xl text-[#8B949E] font-lato">Gateway</p>
+        <div class="bg-[#161B22] border border-[#30363D] rounded-xl px-8 py-6 flex flex-col items-center gap-2">
+          <i data-lucide="shield" class="w-10 h-10 text-[#58A6FF]"></i>
+          <p class="text-3xl font-bold text-[#E6EDF3] font-lato">Nginx</p>
+          <div class="border border-[#30363D] rounded-full px-4 py-1"><p class="text-3xl text-[#8B949E] font-lato">:80/:443</p></div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <p class="text-5xl text-[#58A6FF] font-bold">→</p>
+
+      <!-- Tier 3: Application -->
+      <div class="flex flex-col items-center gap-3">
+        <p class="text-3xl text-[#8B949E] font-lato">Application</p>
+        <div class="bg-[#161B22] border border-[#30363D] rounded-xl px-8 py-6 flex flex-col items-center gap-2">
+          <i data-lucide="code-2" class="w-10 h-10 text-[#58A6FF]"></i>
+          <p class="text-3xl font-bold text-[#E6EDF3] font-lato">Flask App</p>
+          <div class="border border-[#30363D] rounded-full px-4 py-1"><p class="text-3xl text-[#8B949E] font-lato">Python</p></div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <p class="text-5xl text-[#58A6FF] font-bold">→</p>
+
+      <!-- Tier 4: Data Layer -->
+      <div class="flex flex-col items-center gap-3">
+        <p class="text-3xl text-[#8B949E] font-lato">Data Layer</p>
+        <div class="flex flex-col gap-4">
+          <div class="bg-[#161B22] border border-[#30363D] rounded-xl px-8 py-5 flex flex-col items-center gap-2">
+            <i data-lucide="database" class="w-10 h-10 text-[#58A6FF]"></i>
+            <p class="text-3xl font-bold text-[#E6EDF3] font-lato">PostgreSQL</p>
+            <div class="border border-[#30363D] rounded-full px-4 py-1"><p class="text-3xl text-[#8B949E] font-lato">Metrics DB</p></div>
+          </div>
+          <div class="bg-[#161B22] border border-[#30363D] rounded-xl px-8 py-5 flex flex-col items-center gap-2">
+            <i data-lucide="zap" class="w-10 h-10 text-[#58A6FF]"></i>
+            <p class="text-3xl font-bold text-[#E6EDF3] font-lato">Redis</p>
+            <div class="border border-[#30363D] rounded-full px-4 py-1"><p class="text-3xl text-[#8B949E] font-lato">Cache</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <p class="text-5xl text-[#58A6FF] font-bold">→</p>
+
+      <!-- Tier 5: Monitoring -->
+      <div class="flex flex-col items-center gap-3">
+        <p class="text-3xl text-[#8B949E] font-lato">Monitoring</p>
+        <div class="flex flex-col gap-4">
+          <div class="bg-[#161B22] border border-[#30363D] rounded-xl px-8 py-4 flex flex-col items-center gap-2">
+            <i data-lucide="activity" class="w-10 h-10 text-[#58A6FF]"></i>
+            <p class="text-3xl font-bold text-[#E6EDF3] font-lato">Prometheus</p>
+            <div class="border border-[#30363D] rounded-full px-4 py-1"><p class="text-3xl text-[#8B949E] font-lato">Metrics</p></div>
+          </div>
+          <div class="bg-[#161B22] border border-[#30363D] rounded-xl px-8 py-4 flex flex-col items-center gap-2">
+            <i data-lucide="bar-chart-2" class="w-10 h-10 text-[#58A6FF]"></i>
+            <p class="text-3xl font-bold text-[#E6EDF3] font-lato">Grafana</p>
+            <div class="border border-[#30363D] rounded-full px-4 py-1"><p class="text-3xl text-[#8B949E] font-lato">Dashboards</p></div>
+          </div>
+          <div class="bg-[#161B22] border border-[#30363D] rounded-xl px-8 py-4 flex flex-col items-center gap-2">
+            <i data-lucide="file-text" class="w-10 h-10 text-[#58A6FF]"></i>
+            <p class="text-3xl font-bold text-[#E6EDF3] font-lato">Loki</p>
+            <div class="border border-[#30363D] rounded-full px-4 py-1"><p class="text-3xl text-[#8B949E] font-lato">Logs</p></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Caption -->
+    <p class="text-3xl text-[#6E7681] font-merriweather italic text-center">7 сервисов управляются через Docker Compose</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex-none flex flex-row items-center justify-between px-16 py-4 border-t border-[#30363D]">
+    <p class="text-3xl text-[#6E7681] font-lato">DevOpsUA6</p>
+    <p class="text-3xl text-[#6E7681] font-lato">Vitalii Zaburdaiev</p>
+    <p class="text-3xl text-[#6E7681] font-lato">github.com/zaburdaev/my-devops-project</p>
+  </div>
+
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

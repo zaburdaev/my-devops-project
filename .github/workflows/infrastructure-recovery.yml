@@ -7,6 +7,13 @@ permissions:
   contents: read
   actions: write
 
+env:
+  AWS_REGION: eu-central-1
+  KEY_NAME: my-devops-key
+  SG_NAME: health-dashboard-sg
+  EIP_TAG: health-dashboard-eip
+  PROJECT_TAG: my-devops-project
+
 jobs:
   recover:
     runs-on: ubuntu-latest
@@ -17,77 +24,155 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-central-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terraform Init
+      # ============================================
+      # STEP 1: Clean up ALL orphaned AWS resources
+      # This handles the case when EC2 was deleted
+      # manually but Key Pair, SG, EIP remain
+      # ============================================
+      - name: 🧹 Clean orphaned AWS resources (AWS CLI)
+        run: |
+          set -x
+          echo "=== Terminating any running instances ==="
+          INSTANCE_IDS=$(aws ec2 describe-instances \
+            --filters "Name=tag:Project,Values=$PROJECT_TAG" "Name=instance-state-name,Values=running,stopped,pending" \
+            --query 'Reservations[*].Instances[*].InstanceId' --output text) || true
+          if [ -n "$INSTANCE_IDS" ] && [ "$INSTANCE_IDS" != "None" ]; then
+            aws ec2 terminate-instances --instance-ids $INSTANCE_IDS || true
+            echo "Waiting for instances to terminate..."
+            aws ec2 wait instance-terminated --instance-ids $INSTANCE_IDS --cli-read-timeout 120 || true
+          fi
+          echo "✅ Instances cleaned"
+
+          echo "=== Deleting Key Pair ==="
+          aws ec2 delete-key-pair --key-name "$KEY_NAME" 2>/dev/null || true
+          echo "✅ Key Pair cleaned"
+
+          echo "=== Releasing ALL tagged Elastic IPs ==="
+          EIP_ALLOCS=$(aws ec2 describe-addresses \
+            --filters "Name=tag:Name,Values=$EIP_TAG" \
+            --query 'Addresses[*].AllocationId' --output text) || true
+          if [ -n "$EIP_ALLOCS" ] && [ "$EIP_ALLOCS" != "None" ]; then
+            for ALLOC in $EIP_ALLOCS; do
+              echo "Releasing EIP: $ALLOC"
+              aws ec2 release-address --allocation-id "$ALLOC" 2>/dev/null || true
+            done
+          fi
+          echo "✅ Elastic IPs cleaned"
+
+          echo "=== Deleting Security Group ==="
+          SG_ID=$(aws ec2 describe-security-groups \
+            --filters "Name=group-name,Values=$SG_NAME" \
+            --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null) || true
+          if [ -n "$SG_ID" ] && [ "$SG_ID" != "None" ]; then
+            aws ec2 delete-security-group --group-id "$SG_ID" 2>/dev/null || true
+          fi
+          echo "✅ Security Group cleaned"
+
+          echo "=== All orphaned resources cleaned ==="
+
+      # ============================================
+      # STEP 2: Terraform creates everything fresh
+      # ============================================
+      - name: 🔧 Terraform Init
         working-directory: terraform
         run: terraform init
 
-      - name: Terraform Destroy (clean slate)
-        working-directory: terraform
-        run: terraform destroy -auto-approve || true
-
-      - name: Terraform Apply
+      - name: 🚀 Terraform Apply (fresh infrastructure)
         working-directory: terraform
         run: terraform apply -auto-approve
 
-      - name: Get Server IP (Elastic IP)
-        id: get_ip
+      - name: 📋 Get outputs
+        id: tf
         working-directory: terraform
-        run: echo "server_ip=$(terraform output -raw elastic_ip)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "server_ip=$(terraform output -raw elastic_ip)" >> "$GITHUB_OUTPUT"
+          terraform output -raw ssh_private_key > /tmp/ssh_key.pem
+          chmod 600 /tmp/ssh_key.pem
 
-      - name: Update GitHub Secrets
-        uses: gliech/create-github-secret-action@v1
-        with:
-          name: SERVER_HOST
-          value: ${{ steps.get_ip.outputs.server_ip }}
-          pa_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: ⏳ Wait for instance boot (90s)
+        run: sleep 90
 
-      - name: Deploy Application
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ steps.get_ip.outputs.server_ip }}
-          username: ec2-user
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            set -e
-            echo "🚀 Starting deployment..."
+      - name: 🚀 Deploy Application
+        env:
+          SERVER_IP: ${{ steps.tf.outputs.server_ip }}
+        run: |
+          # Use the SSH key from Terraform output directly
+          ssh -i /tmp/ssh_key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 ec2-user@$SERVER_IP << 'DEPLOY_EOF'
+          set -e
+          echo "=== Checking Docker ==="
+          docker --version
+          docker compose version
 
-            # Install dependencies required for deployment
-            sudo dnf install -y git docker-buildx-plugin docker-compose-plugin || true
-            if ! command -v git >/dev/null 2>&1; then
-              sudo yum install -y git
-            fi
+          echo "=== Cloning repository ==="
+          sudo mkdir -p /opt/health-dashboard
+          sudo chown ec2-user:ec2-user /opt/health-dashboard
+          cd /opt/health-dashboard
 
-            # Prepare target directory
-            sudo mkdir -p /opt
-            cd /opt
+          if [ -d ".git" ]; then
+            git config --global --add safe.directory /opt/health-dashboard
+            git pull origin main
+          else
+            git clone https://github.com/zaburdaev/my-devops-project.git .
+          fi
 
-            # First deployment: clone repository
-            if [ ! -d "health-dashboard/.git" ]; then
-              sudo rm -rf health-dashboard
-              sudo git clone https://github.com/zaburdaev/my-devops-project.git health-dashboard
-            fi
+          echo "=== Creating .env ==="
+          cat > .env << 'ENVEOF'
+          POSTGRES_DB=health_dashboard
+          POSTGRES_USER=postgres
+          POSTGRES_PASSWORD=postgres123
+          DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/health_dashboard
+          REDIS_URL=redis://redis:6379/0
+          SECRET_KEY=dev-secret-key-change-in-production
+          FLASK_ENV=production
+          GRAFANA_ADMIN_USER=admin
+          GRAFANA_ADMIN_PASSWORD=admin
+          ENVEOF
 
-            cd /opt/health-dashboard
+          echo "=== Starting containers ==="
+          docker compose pull --ignore-buildable 2>&1 || true
+          docker compose up -d --build --force-recreate
 
-            # Refresh code
-            sudo git fetch origin
-            sudo git checkout main
-            sudo git pull origin main
+          echo "=== Waiting for startup (30s) ==="
+          sleep 30
 
-            # Ensure env file exists
-            if [ -f .env.example ] && [ ! -f .env ]; then
-              sudo cp .env.example .env
-            fi
+          echo "=== Configuring Grafana ==="
+          bash scripts/configure_grafana.sh || true
 
-            # Start stack
-            sudo docker compose up -d --build
+          echo "=== Container status ==="
+          docker compose ps
 
-            echo "✅ Recovery deployment complete"
+          echo "✅ Recovery deployment complete!"
+          DEPLOY_EOF
+
+      - name: ✅ Verify services
+        env:
+          SERVER_IP: ${{ steps.tf.outputs.server_ip }}
+        run: |
+          echo "=== Verifying services ==="
+          echo "Nginx:"
+          curl -sf --max-time 10 http://$SERVER_IP | grep -o "<title>.*</title>" || echo "⚠️ Nginx not ready"
+          echo ""
+          echo "Grafana:"
+          curl -sf --max-time 10 http://$SERVER_IP:3000/api/health || echo "⚠️ Grafana not ready"
+          echo ""
+          echo "Prometheus:"
+          curl -sf --max-time 10 http://$SERVER_IP:9090/-/healthy || echo "⚠️ Prometheus not ready"
+          echo ""
+          echo "=== ✅ Infrastructure recovered at: $SERVER_IP ==="
+          echo "App:        http://$SERVER_IP"
+          echo "Grafana:    http://$SERVER_IP:3000"
+          echo "Prometheus: http://$SERVER_IP:9090"
+
+      - name: 🧹 Cleanup
+        if: always()
+        run: rm -f /tmp/ssh_key.pem

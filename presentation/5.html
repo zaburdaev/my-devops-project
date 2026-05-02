@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>Приложение (Flask)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Merriweather&display=swap');
+.font-lato { font-family: 'Lato', 'Corbel', sans-serif; }
+.font-merriweather { font-family: 'Merriweather', 'Constantia', serif; }
+</style>
+</head>
+<body class="m-0 p-0">
+<div class="relative overflow-hidden w-[1920px] h-[1080px] bg-[#0D1117] flex flex-col">
+
+  <!-- Header -->
+  <div class="flex-none flex flex-row items-center gap-6 px-16 py-8">
+    <div class="bg-[#58A6FF]" style="width:6px; height:50px; border-radius:3px;"></div>
+    <i data-lucide="code-2" class="w-12 h-12 text-[#58A6FF]"></i>
+    <h1 class="text-6xl font-bold font-lato text-[#E6EDF3] leading-tight">Приложение (Flask)</h1>
+  </div>
+
+  <!-- Body -->
+  <div class="flex-1 min-h-0 grid grid-cols-[3fr_2fr] gap-8 px-16 pb-4">
+    <!-- Left Column -->
+    <div class="flex flex-col gap-6">
+      <!-- API Endpoints -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-8 flex flex-col gap-5">
+        <p class="text-4xl font-bold font-lato text-[#E6EDF3]">API Endpoints</p>
+        <!-- Endpoint 1 -->
+        <div class="flex flex-row items-center gap-4">
+          <div class="bg-[#58A6FF] rounded px-4 py-1"><p class="text-3xl font-bold text-[#0D1117] font-lato">GET</p></div>
+          <p class="text-3xl font-bold text-[#E6EDF3] font-lato">/health</p>
+          <p class="text-3xl text-[#8B949E] font-merriweather">— Статус сервисов приложения</p>
+        </div>
+        <!-- Endpoint 2 -->
+        <div class="flex flex-row items-center gap-4">
+          <div class="bg-[#58A6FF] rounded px-4 py-1"><p class="text-3xl font-bold text-[#0D1117] font-lato">GET</p></div>
+          <p class="text-3xl font-bold text-[#E6EDF3] font-lato">/metrics</p>
+          <p class="text-3xl text-[#8B949E] font-merriweather">— Prometheus-совместимые метрики</p>
+        </div>
+        <!-- Endpoint 3 -->
+        <div class="flex flex-row items-center gap-4">
+          <div class="bg-[#58A6FF] rounded px-4 py-1"><p class="text-3xl font-bold text-[#0D1117] font-lato">GET</p></div>
+          <p class="text-3xl font-bold text-[#E6EDF3] font-lato">/api/system-info</p>
+          <p class="text-3xl text-[#8B949E] font-merriweather">— CPU, RAM, Disk (JSON)</p>
+        </div>
+      </div>
+      <!-- Storage Layer -->
+      <div class="flex-none flex flex-row gap-6">
+        <div class="flex-1 min-w-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-4">
+          <i data-lucide="database" class="w-10 h-10 text-[#58A6FF]"></i>
+          <div><p class="text-3xl font-bold text-[#E6EDF3] font-lato">PostgreSQL</p><p class="text-3xl text-[#8B949E] font-merriweather">Хранение метрик</p></div>
+        </div>
+        <div class="flex-1 min-w-0 bg-[#161B22] border border-[#30363D] rounded-xl p-6 flex flex-row items-center gap-4">
+          <i data-lucide="zap" class="w-10 h-10 text-[#58A6FF]"></i>
+          <div><p class="text-3xl font-bold text-[#E6EDF3] font-lato">Redis</p><p class="text-3xl text-[#8B949E] font-merriweather">Кэширование</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="flex flex-col gap-6">
+      <!-- Monitoring Metrics -->
+      <div class="flex-1 min-h-0 bg-[#161B22] border border-[#30363D] rounded-xl p-8 flex flex-col gap-5">
+        <p class="text-4xl font-bold font-lato text-[#E6EDF3]">Мониторинг системы</p>
+        <div class="flex flex-row items-center gap-4"><i data-lucide="cpu" class="w-8 h-8 text-[#58A6FF]"></i><p class="text-3xl text-[#E6EDF3] font-lato">CPU Usage</p></div>
+        <div class="flex flex-row items-center gap-4"><i data-lucide="memory-stick" class="w-8 h-8 text-[#58A6FF]"></i><p class="text-3xl text-[#E6EDF3] font-lato">Memory Usage</p></div>
+        <div class="flex flex-row items-center gap-4"><i data-lucide="hard-drive" class="w-8 h-8 text-[#58A6FF]"></i><p class="text-3xl text-[#E6EDF3] font-lato">Disk Usage</p></div>
+        <div class="flex flex-row items-center gap-4"><i data-lucide="file-json" class="w-8 h-8 text-[#58A6FF]"></i><p class="text-3xl text-[#E6EDF3] font-lato">JSON Logging → Loki</p></div>
+      </div>
+      <!-- Tests Badge -->
+      <div class="flex-none bg-[#161B22] border border-[#30363D] rounded-xl p-8 flex flex-row items-center gap-6">
+        <i data-lucide="check-circle-2" class="w-12 h-12 text-[#3FB950]"></i>
+        <div class="flex flex-col gap-1">
+          <div class="flex flex-row items-baseline gap-3">
+            <p class="text-5xl font-bold text-[#3FB950] font-lato">12</p>
+            <p class="text-3xl text-[#8B949E] font-merriweather">unit тестов (pytest)</p>
+          </div>
+          <div class="border border-[#3FB950] rounded-full px-4 py-1 self-start"><p class="text-3xl text-[#3FB950] font-lato">All Passing</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex-none flex flex-row items-center justify-between px-16 py-4 border-t border-[#30363D]">
+    <p class="text-3xl text-[#6E7681] font-lato">DevOpsUA6</p>
+    <p class="text-3xl text-[#6E7681] font-lato">Vitalii Zaburdaiev</p>
+    <p class="text-3xl text-[#6E7681] font-lato">github.com/zaburdaev/my-devops-project</p>
+  </div>
+
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>
