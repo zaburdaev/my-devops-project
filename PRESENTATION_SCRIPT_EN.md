@@ -67,7 +67,7 @@
 > - **Redis** for caching and session management
 > 
 > But the real value of this project isn't just the application itself - it's the **DevOps infrastructure** I built around it.  
-> The application is running in production on AWS, accessible at **18.156.160.162**, and the entire process from commit to deploy is fully automated."
+> The application is running in production on AWS, accessible at **52.59.86.193**, and the entire process from commit to deploy is fully automated."
 
 #### Key points:
 - Application is WORKING (show on live server)
@@ -286,7 +286,7 @@
 > **Creates AWS resources:**
 > - **EC2 instance** - virtual server (type t2.medium, Ubuntu 22.04)
 > - **Security Groups** - firewall rules (open ports 22, 80, 443, 3000, 9090)
-> - **Elastic IP** - static IP address (18.156.160.162)
+> - **Elastic IP** - static IP address (52.59.86.193)
 > - **VPC and subnets** - network isolation
 > - **SSH keys** - for secure access
 > 
@@ -390,7 +390,7 @@
 > 
 > Let's look at the live dashboard..."
 
-*[Here you can switch to browser and show Grafana at 18.156.160.162:3000]*
+*[Here you can switch to browser and show Grafana at 52.59.86.193:3000]*
 
 #### Key points:
 - Proactive monitoring, not reactive
@@ -543,8 +543,8 @@
 > - Multi-region deployment for high availability
 > 
 > **Project Access:**
-> - 🌐 Application: http://18.156.160.162
-> - 📊 Grafana: http://18.156.160.162:3000
+> - 🌐 Application: http://52.59.86.193
+> - 📊 Grafana: http://52.59.86.193:3000
 > - 💻 GitHub: https://github.com/zaburdaev/my-devops-project
 > 
 > Thank you for your attention! I'm ready to answer your questions."
@@ -562,7 +562,7 @@
 
 #### **Step 1: Show working application** (1 min)
 1. Open browser
-2. Navigate to **http://18.156.160.162**
+2. Navigate to **http://52.59.86.193**
 3. Show homepage
 4. Demonstrate functionality (adding data, viewing statistics)
 
@@ -570,7 +570,7 @@
 > "Here's the application in action. It's running on an AWS server. Let's add a few records... See, data is saved in PostgreSQL, the interface is responsive thanks to Redis caching."
 
 #### **Step 2: Show Grafana monitoring** (1.5 min)
-1. Open new tab: **http://18.156.160.162:3000**
+1. Open new tab: **http://52.59.86.193:3000**
 2. Log into Grafana (admin/admin or your credentials)
 3. Show dashboards:
    - System metrics (CPU, RAM, Disk)
@@ -604,7 +604,7 @@
 
 #### **Step 4: Show SSH connection and Docker** (1 min)
 1. Open terminal
-2. SSH to server: `ssh ubuntu@18.156.160.162`
+2. SSH to server: `ssh ubuntu@52.59.86.193`
 3. Run commands:
    ```bash
    docker ps  # show running containers
@@ -972,9 +972,9 @@
 ### **Day before presentation:**
 
 **Check functionality:**
-- [ ] Application accessible: http://18.156.160.162
-- [ ] Grafana working: http://18.156.160.162:3000
-- [ ] Prometheus collecting metrics: http://18.156.160.162:9090
+- [ ] Application accessible: http://52.59.86.193
+- [ ] Grafana working: http://52.59.86.193:3000
+- [ ] Prometheus collecting metrics: http://52.59.86.193:9090
 - [ ] All Docker containers running: `docker ps` shows 7 containers
 - [ ] No critical alerts in Grafana
 - [ ] GitHub Actions last run successful (green checkmark)
@@ -987,8 +987,8 @@
 
 **Prepare browser:**
 - [ ] Open tabs in advance:
-  - Application: http://18.156.160.162
-  - Grafana: http://18.156.160.162:3000
+  - Application: http://52.59.86.193
+  - Grafana: http://52.59.86.193:3000
   - GitHub: https://github.com/zaburdaev/my-devops-project
   - GitHub Actions: https://github.com/zaburdaev/my-devops-project/actions
 - [ ] Clear history/cache if needed
@@ -1142,7 +1142,7 @@ docker-compose restart
 docker-compose up -d
 
 # SSH to server
-ssh ubuntu@18.156.160.162
+ssh ubuntu@52.59.86.193
 
 # Check GitHub Actions status
 gh run list  # if GitHub CLI installed
@@ -1156,9 +1156,9 @@ df -h
 ---
 
 **Project contacts:**
-- 🌐 **Live Demo:** http://18.156.160.162
-- 📊 **Grafana:** http://18.156.160.162:3000
-- 🔥 **Prometheus:** http://18.156.160.162:9090
+- 🌐 **Live Demo:** http://52.59.86.193
+- 📊 **Grafana:** http://52.59.86.193:3000
+- 🔥 **Prometheus:** http://52.59.86.193:9090
 - 💻 **GitHub:** https://github.com/zaburdaev/my-devops-project
 - 👨‍💻 **Author:** Vitalii Zaburdaiev
 - 🎓 **Course:** DevOpsUA6

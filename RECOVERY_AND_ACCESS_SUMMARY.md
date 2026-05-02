@@ -4,7 +4,7 @@
 
 ## Static Elastic IP
 
-- **Elastic IP:** `18.156.160.162`
+- **Elastic IP:** `52.59.86.193`
 - Terraform output command:
 
 ```bash
@@ -14,9 +14,9 @@ terraform output -raw elastic_ip
 
 ## Service Access
 
-- Health Dashboard: http://18.156.160.162
-- Grafana: http://18.156.160.162:3000
-- Prometheus: http://18.156.160.162:9090
+- Health Dashboard: http://52.59.86.193
+- Grafana: http://52.59.86.193:3000
+- Prometheus: http://52.59.86.193:9090
 
 ## Infrastructure Recovery (Manual Trigger)
 

@@ -30,7 +30,7 @@ fi
 SSH to server and create `.env`:
 
 ```bash
-ssh ec2-user@18.156.160.162
+ssh ec2-user@52.59.86.193
 cd /opt/health-dashboard
 cp .env.example .env
 docker compose down

@@ -2,7 +2,7 @@
 
 > **Автор:** Vitalii Zaburdaiev | DevOpsUA6  
 > **Проект:** Health Dashboard (my-devops-project)  
-> **Сервер:** 18.156.160.162
+> **Сервер:** 52.59.86.193
 
 ---
 
@@ -15,7 +15,7 @@
 ### Шаг 1: Подключитесь к серверу
 
 ```bash
-ssh -i my-devops-key.pem ec2-user@18.156.160.162
+ssh -i my-devops-key.pem ec2-user@52.59.86.193
 ```
 
 > ⚠️ Если получаете ошибку "Permission denied", выполните: `chmod 400 my-devops-key.pem`
@@ -112,10 +112,10 @@ curl -s http://localhost:3000 | head -1
 
 | Сервис | URL (внутри сервера) | URL (снаружи) | Описание |
 |--------|---------------------|---------------|----------|
-| Приложение | http://localhost:5000 | http://18.156.160.162:5000 | Flask API |
-| Nginx | http://localhost:80 | http://18.156.160.162 | Реверс-прокси |
-| Grafana | http://localhost:3000 | http://18.156.160.162:3000 | Мониторинг |
-| Prometheus | http://localhost:9090 | http://18.156.160.162:9090 | Метрики |
+| Приложение | http://localhost:5000 | http://52.59.86.193:5000 | Flask API |
+| Nginx | http://localhost:80 | http://52.59.86.193 | Реверс-прокси |
+| Grafana | http://localhost:3000 | http://52.59.86.193:3000 | Мониторинг |
+| Prometheus | http://localhost:9090 | http://52.59.86.193:9090 | Метрики |
 
 ---
 

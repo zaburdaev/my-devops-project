@@ -7,7 +7,7 @@
 ## 🔴 TASK 1: ELASTIC IP ISSUE - CRITICAL FINDING
 
 ### Problem Summary
-Your infrastructure was recreated with a **NEW Elastic IP (18.156.160.162)** instead of reusing the **ORIGINAL IP (18.156.160.162)**.
+Your infrastructure was recreated with a **NEW Elastic IP (52.59.86.193)** instead of reusing the **ORIGINAL IP (52.59.86.193)**.
 
 ### Root Cause
 The Terraform configuration in `terraform/main.tf` **always creates a new Elastic IP allocation**:
@@ -29,18 +29,18 @@ Every time you run `terraform apply`, this creates a **fresh** EIP instead of re
 
 | IP Address | Status | Associated With | Allocation ID |
 |-----------|--------|-----------------|-----------------|
-| **18.156.160.162** | 🔴 **RELEASED** (GONE) | — | — |
-| **18.156.160.162** | ✅ Active | EC2: `i-059c8320d831be2bf` | `eipalloc-0f1d885679fa634f8` |
+| **52.59.86.193** | 🔴 **RELEASED** (GONE) | — | — |
+| **52.59.86.193** | ✅ Active | EC2: `i-059c8320d831be2bf` | `eipalloc-0f1d885679fa634f8` |
 | **18.184.217.22** | ❌ Unassociated | — | `eipalloc-09dfda03e21afbd57` |
 
 ### The Bad News 😞
 
-**AWS does NOT allow requesting a specific Elastic IP address.** You cannot "get back" 18.156.160.162 because:
+**AWS does NOT allow requesting a specific Elastic IP address.** You cannot "get back" 52.59.86.193 because:
 - ✗ AWS Elastic IPs are released back to the pool when you release them
 - ✗ There's no API to request a specific IP
 - ✗ Once released, it may be allocated to other customers
 
-**You CANNOT reuse 18.156.160.162. It's permanently lost.**
+**You CANNOT reuse 52.59.86.193. It's permanently lost.**
 
 ### The Good News ✅
 
@@ -54,8 +54,8 @@ Every time you run `terraform apply`, this creates a **fresh** EIP instead of re
 **You have 3 options:**
 
 #### ✅ **OPTION 1: KEEP THE NEW IP (RECOMMENDED)**
-Accept 18.156.160.162 as your new stable IP:
-- Update GitHub Secrets: `SERVER_HOST = 18.156.160.162`
+Accept 52.59.86.193 as your new stable IP:
+- Update GitHub Secrets: `SERVER_HOST = 52.59.86.193`
 - Update DNS records (if any domain points to old IP)
 - Update all documentation references
 - The IP is **STABLE** and won't change unless you release it
@@ -63,10 +63,10 @@ Accept 18.156.160.162 as your new stable IP:
 **Why this is best:** Simplest, no additional costs, the new IP works perfectly.
 
 #### 🎲 **OPTION 2: TRY TO GET A "SIMILAR" IP (RISKY)**
-Release 18.156.160.162 and allocate a new one, hoping for a similar IP in the same range:
+Release 52.59.86.193 and allocate a new one, hoping for a similar IP in the same range:
 ```bash
 # In AWS console or CLI:
-# 1. Release eipalloc-0f1d885679fa634f8 (18.156.160.162)
+# 1. Release eipalloc-0f1d885679fa634f8 (52.59.86.193)
 # 2. Allocate new Elastic IP in eu-central-1
 # 3. Might get 18.156.160.165 or similar
 ```
@@ -102,15 +102,15 @@ resource "aws_eip_association" "app_eip_assoc" {
 **Terraform State (terraform/main.tf):**
 - ✅ References correct allocation: `eipalloc-0f1d885679fa634f8`
 - ✅ Associated with correct instance: `i-059c8320d831be2bf`
-- ✅ Current IP: `18.156.160.162`
+- ✅ Current IP: `52.59.86.193`
 
 **GitHub Secrets:**
 - Uses: `secrets.SERVER_HOST` in `.github/workflows/ci-cd.yml`
 - Actual value: **NEEDS VERIFICATION** (not stored in repo, set in GitHub)
-- Should be: `18.156.160.162`
+- Should be: `52.59.86.193`
 
 **Documentation:**
-- ❌ 110+ references to old IP `18.156.160.162` found
+- ❌ 110+ references to old IP `52.59.86.193` found
 - Files affected: docs/, presentations, guides, README files
 - Status: **OUTDATED** - needs mass update
 
@@ -275,8 +275,8 @@ Document it clearly as an optional setup method:
 
 | Issue | Status | Details |
 |-------|--------|---------|
-| **Elastic IP 18.156.160.162** | 🔴 LOST | Released to AWS, cannot be recovered |
-| **Elastic IP 18.156.160.162** | ✅ ACTIVE | Currently in use, stable |
+| **Elastic IP 52.59.86.193** | 🔴 LOST | Released to AWS, cannot be recovered |
+| **Elastic IP 52.59.86.193** | ✅ ACTIVE | Currently in use, stable |
 | **Terraform State** | ✅ SYNCED | Correctly configured |
 | **AWS Configuration** | ✅ CORRECT | Instance has correct EIP |
 | **Ansible in project** | ✅ EXISTS | All files present and functional |
@@ -288,12 +288,12 @@ Document it clearly as an optional setup method:
 ## ✅ Action Items Checklist
 
 ### For Elastic IP Issue:
-- [ ] **CRITICAL:** Update `secrets.SERVER_HOST` in GitHub to `18.156.160.162`
+- [ ] **CRITICAL:** Update `secrets.SERVER_HOST` in GitHub to `52.59.86.193`
   - Go to: GitHub Repo → Settings → Secrets and variables → Actions
   - Update `SERVER_HOST` secret value
 - [ ] Update DNS records (if you have a custom domain pointing to old IP)
 - [ ] Update documentation files with new IP (110+ references)
-  - Consider using: `find . -type f -name "*.md" -exec sed -i 's/3\.127\.155\.114/18.156.160.162/g' {} \;`
+  - Consider using: `find . -type f -name "*.md" -exec sed -i 's/3\.127\.155\.114/52.59.86.193/g' {} \;`
 
 ### For Ansible Issue:
 - [ ] **DECIDE:** Keep, integrate, or remove Ansible from project

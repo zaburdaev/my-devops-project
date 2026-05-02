@@ -10,7 +10,7 @@
 > **Author:** Vitalii Zaburdaiev  
 > **Course:** DevOpsUA6  
 > **Docker Hub:** [oskalibriya/health-dashboard](https://hub.docker.com/r/oskalibriya/health-dashboard)  
-> **AWS:** Deployed at `18.156.160.162` ✅  
+> **AWS:** Deployed at `52.59.86.193` ✅  
 > **Description:** A full-stack DevOps project featuring a system health monitoring dashboard built with Flask, containerized with Docker, orchestrated with Kubernetes, provisioned with Terraform, configured with Ansible, and monitored with Prometheus + Grafana.
 
 [Версия RU ](./README_RU.md)
@@ -312,13 +312,13 @@ The application is **deployed and running** on AWS:
 
 | Service | URL |
 |---------|-----|
-| **Health Dashboard** | http://18.156.160.162 |
-| **Grafana** | http://18.156.160.162:3000 |
-| **Prometheus** | http://18.156.160.162:9090 |
+| **Health Dashboard** | http://52.59.86.193 |
+| **Grafana** | http://52.59.86.193:3000 |
+| **Prometheus** | http://52.59.86.193:9090 |
 
 ### Elastic IP (Static)
 
-Infrastructure now uses an **AWS Elastic IP** (`18.156.160.162`), so public access IP remains stable even if EC2 is recreated.
+Infrastructure now uses an **AWS Elastic IP** (`52.59.86.193`), so public access IP remains stable even if EC2 is recreated.
 
 You can always get the current static IP from Terraform:
 

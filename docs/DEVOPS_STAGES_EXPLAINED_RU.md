@@ -3,7 +3,7 @@
 **Автор:** Vitalii Zaburdaiev  
 **Проект:** Health Dashboard  
 **Курс:** DevOpsUA6  
-**Актуальный IP:** `18.156.160.162`  
+**Актуальный IP:** `52.59.86.193`  
 **EC2 Instance:** `i-059c8320d831be2bf`
 
 ---
@@ -96,7 +96,7 @@ app/
 ### 🔄 Как работает приложение
 
 ```
-Пользователь → http://18.156.160.162/health
+Пользователь → http://52.59.86.193/health
                          │
                     ┌─────▼──────┐
                     │   Nginx    │  :80
@@ -324,7 +324,7 @@ Developer: git push origin main
         ▼
   ┌───────────────────────────────────┐
   │  ANSIBLE PLAYBOOK                 │
-  │  SSH → 18.156.160.162             │
+  │  SSH → 52.59.86.193             │
   │  ├── docker install ✅            │
   │  ├── git pull ✅                  │
   │  ├── docker compose up ✅         │
@@ -346,7 +346,7 @@ Developer: git push origin main
 
 | Секрет | Описание | Используется в |
 |--------|----------|----------------|
-| `SERVER_HOST` | IP сервера (`18.156.160.162`) | deploy (Ansible inventory) |
+| `SERVER_HOST` | IP сервера (`52.59.86.193`) | deploy (Ansible inventory) |
 | `SERVER_USER` | SSH пользователь (`ec2-user`) | deploy (Ansible inventory) |
 | `SSH_PRIVATE_KEY` | Содержимое `.pem` файла | deploy (SSH auth) |
 | `DOCKER_USERNAME` | Docker Hub логин | build + deploy |
@@ -411,7 +411,7 @@ terraform/
 │  └──────────────────────────────────────────────────────────┘  │
 │                                                                 │
 │  ┌── aws_eip + aws_eip_association ─────────────────────────┐  │
-│  │ Elastic IP: 18.156.160.162                                │  │
+│  │ Elastic IP: 52.59.86.193                                │  │
 │  │ (статический IP, привязан к EC2)                         │  │
 │  └──────────────────────────────────────────────────────────┘  │
 │                                                                 │
@@ -485,7 +485,7 @@ GitHub Actions (ci-cd.yml)
         ├── pip install ansible
         ├── Создаёт inventory.ini:
         │   [webservers]
-        │   production ansible_host=18.156.160.162
+        │   production ansible_host=52.59.86.193
         │              ansible_user=ec2-user
         │              ansible_ssh_private_key_file=~/.ssh/deploy_key
         │
@@ -493,7 +493,7 @@ GitHub Actions (ci-cd.yml)
                 │
                 ▼ SSH
         ┌──────────────────────────────┐
-        │  EC2: 18.156.160.162         │
+        │  EC2: 52.59.86.193         │
         │                              │
         │  Role: docker                │
         │  ├── yum install docker      │
@@ -700,9 +700,9 @@ scrape_configs:
 
 | Сервис | URL | Логин |
 |--------|-----|-------|
-| Grafana | http://18.156.160.162:3000 | Из `.env` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`) |
-| Prometheus | http://18.156.160.162:9090 | Без авторизации |
-| Prometheus Targets | http://18.156.160.162:9090/targets | flask-app должен быть UP |
+| Grafana | http://52.59.86.193:3000 | Из `.env` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`) |
+| Prometheus | http://52.59.86.193:9090 | Без авторизации |
+| Prometheus Targets | http://52.59.86.193:9090/targets | flask-app должен быть UP |
 
 ### 🎯 Что сказать на защите
 
@@ -811,7 +811,7 @@ server {
 ```
 Пользователь
     │
-    │  http://18.156.160.162/health
+    │  http://52.59.86.193/health
     ▼
 ┌─────────┐
 │  Nginx  │ :80
@@ -907,7 +907,7 @@ Admin нажимает "Run workflow"
 HISTORY:
 ─────────────────────────────────────────────────────
 Первоначальный сервер:   IP 3.127.155.114    ← ПОТЕРЯН (Elastic IP released)
-Infrastructure Recovery: IP 18.156.160.162   ← ТЕКУЩИЙ (новый Elastic IP)
+Infrastructure Recovery: IP 52.59.86.193   ← ТЕКУЩИЙ (новый Elastic IP)
 EC2 Instance:           i-059c8320d831be2bf
 ─────────────────────────────────────────────────────
 
@@ -926,7 +926,7 @@ EC2 Instance:           i-059c8320d831be2bf
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    HEALTH DASHBOARD PROJECT                          │
-│                    Elastic IP: 18.156.160.162                       │
+│                    Elastic IP: 52.59.86.193                       │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
 │  📝 КОД          Flask + Python          → app/app.py               │
@@ -951,10 +951,10 @@ EC2 Instance:           i-059c8320d831be2bf
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
 │  ДОСТУП:                                                            │
-│  🌐 Приложение:  http://18.156.160.162                              │
-│  📊 Grafana:     http://18.156.160.162:3000                         │
-│  🔥 Prometheus:  http://18.156.160.162:9090                         │
-│  🏥 Health:      http://18.156.160.162/health                       │
+│  🌐 Приложение:  http://52.59.86.193                              │
+│  📊 Grafana:     http://52.59.86.193:3000                         │
+│  🔥 Prometheus:  http://52.59.86.193:9090                         │
+│  🏥 Health:      http://52.59.86.193/health                       │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
