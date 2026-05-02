@@ -1,8 +1,22 @@
 ---
 # =============================================================================
-# Ansible Playbook for Health Dashboard
+# Ansible Playbook for Health Dashboard — CI/CD Deployment
 # Author: Vitalii Zaburdaiev | DevOpsUA6
-# Installs Docker, Docker Compose, configures firewall, and deploys the app
+#
+# This playbook is used by GitHub Actions CI/CD pipeline to deploy the
+# application to the production server. It handles:
+#   1. System prerequisites (git, firewall)
+#   2. Docker installation & configuration
+#   3. Application deployment via Docker Compose
+#   4. Grafana datasource & dashboard configuration
+#   5. Health checks to verify successful deployment
+#
+# Usage (from project root):
+#   ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
+#
+# Required variables (passed via --extra-vars or environment):
+#   docker_username  — Docker Hub username for image pull
+#   app_repo         — GitHub repository URL
 # =============================================================================
 
 - name: Deploy Health Dashboard
@@ -11,52 +25,42 @@
 
   vars:
     app_dir: /opt/health-dashboard
+    app_repo: "https://github.com/zaburdaev/my-devops-project.git"
     docker_compose_version: "2.24.0"
 
   roles:
     - docker
     - app
 
-  tasks:
-    # --- System Update ---
-    - name: Update system packages
-      yum:
-        name: "*"
-        state: latest
-      tags: system
+  post_tasks:
+    # --- Grafana configuration (non-critical) ---
+    - name: Configure Grafana datasource and dashboards
+      shell: |
+        set -a
+        source {{ app_dir }}/.env
+        set +a
+        GRAFANA_USER="${GF_SECURITY_ADMIN_USER:-admin}" \
+        GRAFANA_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD:-admin}" \
+        bash {{ app_dir }}/scripts/configure_grafana.sh
+      args:
+        chdir: "{{ app_dir }}"
+      become_user: ec2-user
+      ignore_errors: yes
+      tags: grafana
 
-    # --- Install Git ---
-    - name: Install git
-      yum:
-        name: git
-        state: present
-      tags: system
+    # --- Final health verification ---
+    - name: Verify application health (via Nginx)
+      uri:
+        url: "http://localhost/health"
+        status_code: 200
+        return_content: yes
+      register: health_result
+      retries: 5
+      delay: 10
+      until: health_result.status == 200
+      tags: verify
 
-    # --- Firewall Configuration ---
-    - name: Install firewalld
-      yum:
-        name: firewalld
-        state: present
-      tags: firewall
-
-    - name: Start and enable firewalld
-      systemd:
-        name: firewalld
-        state: started
-        enabled: yes
-      tags: firewall
-
-    - name: Open required ports in firewall
-      firewalld:
-        port: "{{ item }}"
-        permanent: yes
-        state: enabled
-        immediate: yes
-      loop:
-        - 80/tcp      # HTTP (Nginx)
-        - 443/tcp     # HTTPS
-        - 22/tcp      # SSH
-        - 3000/tcp    # Grafana
-        - 9090/tcp    # Prometheus
-        - 5000/tcp    # Flask app
-      tags: firewall
+    - name: Show deployment result
+      debug:
+        msg: "✅ Deployment successful! Health: {{ health_result.json | default(health_result.content) }}"
+      tags: verify

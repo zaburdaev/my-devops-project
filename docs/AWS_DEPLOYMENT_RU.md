@@ -307,7 +307,7 @@ aws ec2 describe-instances \
 ssh -i my-devops-key.pem ec2-user@<IP_АДРЕС>
 
 # Пример:
-ssh -i my-devops-key.pem ec2-user@3.127.155.114
+ssh -i my-devops-key.pem ec2-user@18.156.160.162
 ```
 
 **⚠️ Важно:**

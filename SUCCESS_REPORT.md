@@ -11,18 +11,18 @@
 
 ## 🌐 Live Services
 
-### Static Elastic IP: **3.127.155.114**
+### Static Elastic IP: **18.156.160.162**
 This IP never changes, even if the server is recreated!
 
 ### Deployed Services:
 
 | Service | URL | Status | Credentials |
 |---------|-----|--------|-------------|
-| Flask Application | http://3.127.155.114:5000 | ✅ Running | - |
-| Health Check | http://3.127.155.114:5000/health | ✅ Healthy | - |
-| Grafana | http://3.127.155.114:3000 | ✅ Fast & Responsive | from `.env` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`) |
-| Prometheus | http://3.127.155.114:9090 | ✅ Collecting Metrics | - |
-| Nginx | http://3.127.155.114 | ✅ Running | - |
+| Flask Application | http://18.156.160.162:5000 | ✅ Running | - |
+| Health Check | http://18.156.160.162:5000/health | ✅ Healthy | - |
+| Grafana | http://18.156.160.162:3000 | ✅ Fast & Responsive | from `.env` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`) |
+| Prometheus | http://18.156.160.162:9090 | ✅ Collecting Metrics | - |
+| Nginx | http://18.156.160.162 | ✅ Running | - |
 
 ---
 
@@ -123,7 +123,7 @@ This IP never changes, even if the server is recreated!
 
 ## ✅ Verification Checklist
 
-- [x] Static Elastic IP configured (3.127.155.114)
+- [x] Static Elastic IP configured (18.156.160.162)
 - [x] Application deployed and accessible
 - [x] Health check endpoint returns "healthy"
 - [x] Grafana loads quickly (<5 seconds)
@@ -139,8 +139,8 @@ This IP never changes, even if the server is recreated!
 ## 🎓 For Course Demonstration
 
 ### Show Professor:
-1. **Live Application:** http://3.127.155.114:5000/health
-2. **Grafana Dashboard:** http://3.127.155.114:3000 (shows real-time metrics)
+1. **Live Application:** http://18.156.160.162:5000/health
+2. **Grafana Dashboard:** http://18.156.160.162:3000 (shows real-time metrics)
 3. **GitHub Repository:** https://github.com/zaburdaev/my-devops-project
 4. **CI/CD Pipeline:** https://github.com/zaburdaev/my-devops-project/actions
 5. **Infrastructure Recovery:** One-click restoration via GitHub Actions
@@ -159,7 +159,7 @@ This IP never changes, even if the server is recreated!
 
 | Requirement | Status | Evidence |
 |-------------|--------|----------|
-| Working Application | ✅ | http://3.127.155.114:5000 |
+| Working Application | ✅ | http://18.156.160.162:5000 |
 | CI/CD Pipeline | ✅ | GitHub Actions passing |
 | Infrastructure as Code | ✅ | Terraform + Ansible |
 | Containerization | ✅ | Docker + Docker Compose |

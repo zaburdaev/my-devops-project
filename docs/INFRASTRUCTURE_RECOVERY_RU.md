@@ -27,7 +27,7 @@
 - Предсказуемое восстановление после инцидентов.
 
 Текущий статический IP проекта:
-- `3.127.155.114`
+- `18.156.160.162`
 
 Проверка через Terraform:
 
@@ -91,9 +91,9 @@ terraform output prometheus_url
 ### Проверка сервисов
 
 ```bash
-curl http://3.127.155.114/health
-curl http://3.127.155.114:9090/-/ready
-curl http://3.127.155.114:3000/api/health
+curl http://18.156.160.162/health
+curl http://18.156.160.162:9090/-/ready
+curl http://18.156.160.162:3000/api/health
 ```
 
 Ожидаемо:
@@ -103,8 +103,8 @@ curl http://3.127.155.114:3000/api/health
 
 ### Проверка мониторинга
 
-- Grafana: `http://3.127.155.114:3000`
-- Prometheus: `http://3.127.155.114:9090/targets`
+- Grafana: `http://18.156.160.162:3000`
+- Prometheus: `http://18.156.160.162:9090/targets`
 - Target `flask-app` должен быть **UP**.
 
 ---
@@ -139,7 +139,7 @@ curl http://3.127.155.114:3000/api/health
 ### Проблема: Grafana открывается, но "No Data"
 
 Проверки:
-1. `http://3.127.155.114:9090/targets` — `flask-app` должен быть UP.
+1. `http://18.156.160.162:9090/targets` — `flask-app` должен быть UP.
 2. В Grafana есть datasource `Prometheus` (Loki удалён в оптимизированной конфигурации).
 3. В контейнерах смонтирован каталог `./monitoring/grafana/provisioning`.
 

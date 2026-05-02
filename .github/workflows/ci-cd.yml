@@ -7,6 +7,9 @@ on:
     branches: [ main ]
 
 jobs:
+  # ============================================
+  # STAGE 1: Run unit tests
+  # ============================================
   test:
     name: 🧪 Run Tests
     runs-on: ubuntu-latest
@@ -29,6 +32,9 @@ jobs:
         run: |
           pytest tests/ -v --cov=app --cov-report=term-missing
 
+  # ============================================
+  # STAGE 2: Build Docker image and push to Hub
+  # ============================================
   build:
     name: 🐳 Build and Push Docker Image
     runs-on: ubuntu-latest
@@ -54,106 +60,69 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/health-dashboard:latest
             ${{ secrets.DOCKER_USERNAME }}/health-dashboard:${{ github.sha }}
 
+  # ============================================
+  # STAGE 3: Deploy to server using Ansible
+  # ============================================
   deploy:
-    name: 🚀 Deploy to Server
+    name: 🚀 Deploy via Ansible
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: 🚀 Deploy to Server
-        uses: appleboy/ssh-action@v1.0.3
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            set -euo pipefail
+          python-version: '3.11'
 
-            APP_DIR="/opt/health-dashboard"
-            REPO_URL="https://github.com/zaburdaev/my-devops-project.git"
+      - name: 📦 Install Ansible
+        run: |
+          pip install ansible
 
-            echo "🚀 Starting deployment..."
+      - name: 🔑 Configure SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
-            if ! command -v git >/dev/null 2>&1; then
-              echo "📦 git not found, installing..."
-              if command -v yum >/dev/null 2>&1; then
-                sudo yum install -y git
-              elif command -v dnf >/dev/null 2>&1; then
-                sudo dnf install -y git
-              elif command -v apt-get >/dev/null 2>&1; then
-                sudo apt-get update -y
-                sudo apt-get install -y git
-              else
-                echo "❌ Unsupported package manager. Install git manually."
-                exit 1
-              fi
-            fi
+      - name: 📝 Generate Ansible inventory
+        run: |
+          cat > ansible/inventory.ini << EOF
+          [webservers]
+          production ansible_host=${{ secrets.SERVER_HOST }} ansible_user=${{ secrets.SERVER_USER }} ansible_ssh_private_key_file=~/.ssh/deploy_key
 
-            sudo mkdir -p "${APP_DIR}"
-            sudo chown -R "$(whoami):$(whoami)" "${APP_DIR}"
+          [webservers:vars]
+          ansible_python_interpreter=/usr/bin/python3
+          EOF
 
-            if [ ! -d "${APP_DIR}/.git" ]; then
-              echo "📦 First deployment - cloning repository..."
-              git clone "${REPO_URL}" "${APP_DIR}"
-            else
-              echo "📥 Existing deployment - syncing repository with origin/main..."
-              cd "${APP_DIR}"
-              git fetch origin main
-              git reset --hard origin/main
-              git clean -fd
-            fi
+      - name: 🚀 Run Ansible Playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+        run: |
+          ansible-playbook \
+            -i ansible/inventory.ini \
+            ansible/playbook.yml \
+            --extra-vars "docker_username=${{ secrets.DOCKER_USERNAME }}" \
+            -v
 
-            cd "${APP_DIR}"
-
-            echo "📝 Regenerating .env from .env.example..."
-            cp -f .env.example .env
-
-            set -a
-            source ./.env
-            set +a
-
-            echo "🛑 Stopping old containers..."
-            docker compose down
-
-            echo "📥 Pulling pre-built images only (skipping buildable services)..."
-            docker compose pull --ignore-buildable
-
-            echo "🚀 Rebuilding and starting fresh containers..."
-            docker compose up -d --build --force-recreate
-
-            echo "⏳ Waiting for services to initialize..."
-            sleep 30
-
-            echo "📊 Container Status:"
-            docker compose ps
-
-            echo "🎛️ Configuring Grafana datasource and dashboard import..."
-            GRAFANA_USER="${GF_SECURITY_ADMIN_USER:-admin}" \
-            GRAFANA_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD:-admin}" \
-            bash scripts/configure_grafana.sh || echo "⚠️ Grafana configuration failed (non-critical), continuing..."
-
-            echo "🏥 Application Health Check (via Nginx):"
-            if curl -sf http://localhost/health > /dev/null 2>&1; then
-              echo "✅ Application is HEALTHY (via Nginx)"
-              curl -s http://localhost/health | jq '.' 2>/dev/null || curl -s http://localhost/health
-            else
-              echo "❌ Application health check FAILED"
-              docker compose logs app --tail=20
-              exit 1
-            fi
-
-            echo "✅ Deployment successful! Core services are up."
-
-      - name: ✅ Post-deploy monitoring verification (non-blocking)
-        continue-on-error: true
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            set -euo pipefail
-            cd /opt/health-dashboard
-            echo "🔎 Running monitoring verification (non-blocking)..."
-            bash scripts/verify_monitoring.sh
+      - name: ✅ Post-deploy verification
+        run: |
+          echo "🔎 Verifying deployment..."
+          echo ""
+          echo "=== Application Health ==="
+          curl -sf --max-time 15 http://${{ secrets.SERVER_HOST }}/health | python3 -m json.tool 2>/dev/null || echo "⚠️ App health check pending"
+          echo ""
+          echo "=== Grafana ==="
+          curl -sf --max-time 10 http://${{ secrets.SERVER_HOST }}:3000/api/health || echo "⚠️ Grafana not ready yet"
+          echo ""
+          echo "=== Prometheus ==="
+          curl -sf --max-time 10 http://${{ secrets.SERVER_HOST }}:9090/-/healthy || echo "⚠️ Prometheus not ready yet"
+          echo ""
+          echo "✅ Deployment complete!"
+          echo "🌐 App:        http://${{ secrets.SERVER_HOST }}"
+          echo "📊 Grafana:    http://${{ secrets.SERVER_HOST }}:3000"
+          echo "🔥 Prometheus: http://${{ secrets.SERVER_HOST }}:9090"

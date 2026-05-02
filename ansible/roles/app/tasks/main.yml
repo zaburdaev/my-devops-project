@@ -1,6 +1,12 @@
 ---
 # Role: app
 # Deploys the Health Dashboard application using Docker Compose
+# Handles: git clone/pull, .env setup, docker compose up, health check
+
+- name: Install git
+  yum:
+    name: git
+    state: present
 
 - name: Create application directory
   file:
@@ -10,33 +16,65 @@
     group: ec2-user
     mode: '0755'
 
-- name: Clone or update application repository
+- name: Clone application repository (first deploy)
   git:
-    repo: "https://github.com/zaburdaev/my-devops-project.git"
+    repo: "{{ app_repo }}"
     dest: "{{ app_dir }}"
     version: main
     force: true
   become_user: ec2-user
 
-- name: Copy .env file to server
+- name: Generate .env from .env.example
   copy:
-    src: "{{ playbook_dir }}/../.env"
+    src: "{{ app_dir }}/.env.example"
     dest: "{{ app_dir }}/.env"
+    remote_src: yes
     owner: ec2-user
     group: ec2-user
     mode: '0600'
+    force: yes
 
-- name: Deploy application with Docker Compose
-  command: docker compose up -d --build
+- name: Stop old containers
+  command: docker compose down
+  args:
+    chdir: "{{ app_dir }}"
+  become_user: ec2-user
+  ignore_errors: yes
+
+- name: Pull pre-built images (skip buildable)
+  command: docker compose pull --ignore-buildable
+  args:
+    chdir: "{{ app_dir }}"
+  become_user: ec2-user
+  ignore_errors: yes
+
+- name: Build and start containers
+  command: docker compose up -d --build --force-recreate
   args:
     chdir: "{{ app_dir }}"
   become_user: ec2-user
 
-- name: Wait for application to be healthy
+- name: Wait for services to initialize
+  pause:
+    seconds: 30
+
+- name: Show container status
+  command: docker compose ps
+  args:
+    chdir: "{{ app_dir }}"
+  become_user: ec2-user
+  register: compose_status
+  changed_when: false
+
+- name: Print container status
+  debug:
+    msg: "{{ compose_status.stdout_lines }}"
+
+- name: Health check — application via localhost
   uri:
-    url: "http://localhost:5000/health"
+    url: "http://localhost/health"
     status_code: 200
-  register: result
-  until: result.status == 200
-  retries: 20
+  register: app_health
+  retries: 15
   delay: 10
+  until: app_health.status == 200

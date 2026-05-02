@@ -2,24 +2,24 @@
 
 ## Final Infrastructure State
 
-- **Static Elastic IP:** `3.127.155.114`
+- **Static Elastic IP:** `18.156.160.162`
 - **AWS Region:** `eu-central-1`
 - **EC2 Instance ID:** `i-0c4b446783b0704eb`
 - **Terraform status:** applied successfully (no resource drift requiring recreation)
 
 ## Service URLs
 
-- **Main Dashboard (Nginx):** http://3.127.155.114
-- **App Health (Flask):** http://3.127.155.114/health
-- **Grafana:** http://3.127.155.114:3000
-- **Prometheus:** http://3.127.155.114:9090
+- **Main Dashboard (Nginx):** http://18.156.160.162
+- **App Health (Flask):** http://18.156.160.162/health
+- **Grafana:** http://18.156.160.162:3000
+- **Prometheus:** http://18.156.160.162:9090
 
 ## GitHub + CI/CD Status
 
 - Local commits were pushed to `main` successfully (HEAD: `1eeb2f6`).
 - Workflow exists and is active: `.github/workflows/infrastructure-recovery.yml`
 - `workflow_dispatch` trigger is present (manual run button available in Actions UI).
-- GitHub Actions secret `SERVER_HOST` was updated to the Elastic IP (`3.127.155.114`).
+- GitHub Actions secret `SERVER_HOST` was updated to the Elastic IP (`18.156.160.162`).
 
 ## Grafana Provisioning Verification
 

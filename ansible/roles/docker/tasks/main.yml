@@ -1,8 +1,9 @@
 ---
 # Role: docker
 # Installs Docker and Docker Compose on Amazon Linux / RHEL
+# Ensures Docker service is running and ec2-user can use it
 
-- name: Install Docker dependencies
+- name: Install Docker and dependencies
   yum:
     name:
       - docker
@@ -21,11 +22,22 @@
     groups: docker
     append: yes
 
-- name: Install Docker Compose
+- name: Check if Docker Compose v2 plugin exists
+  stat:
+    path: /usr/libexec/docker/cli-plugins/docker-compose
+  register: compose_plugin
+
+- name: Check if standalone docker-compose exists
+  stat:
+    path: /usr/local/bin/docker-compose
+  register: compose_standalone
+
+- name: Install Docker Compose (standalone binary)
   get_url:
     url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_version }}/docker-compose-linux-x86_64"
     dest: /usr/local/bin/docker-compose
     mode: '0755'
+  when: not compose_plugin.stat.exists and not compose_standalone.stat.exists
 
 - name: Verify Docker installation
   command: docker --version
@@ -34,4 +46,4 @@
 
 - name: Print Docker version
   debug:
-    msg: "{{ docker_version.stdout }}"
+    msg: "Docker: {{ docker_version.stdout }}"

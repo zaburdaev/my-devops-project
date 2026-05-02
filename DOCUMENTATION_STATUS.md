@@ -11,7 +11,7 @@
 ### Проверенные ключевые факты
 
 1. **Infrastructure / Access**
-   - Elastic IP: `3.127.155.114`
+   - Elastic IP: `18.156.160.162`
    - Основные URL и recovery-инструкции актуальны
 
 2. **Compose stack**
