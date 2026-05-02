@@ -448,7 +448,7 @@ This project is licensed under the MIT License — see the [LICENSE](./LICENSE) 
 - **Project Link:** [github.com/zaburdaev/my-devops-project](https://github.com/zaburdaev/my-devops-project)
 
 ---
-Live demo check 3
+Live demo check 3___
 
 <!-- Last updated: 2026-05-02 - Testing Grafana authentication fix (commit f57c189) -->
 
