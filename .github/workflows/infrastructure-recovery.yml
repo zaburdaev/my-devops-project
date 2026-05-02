@@ -35,9 +35,9 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       # ============================================
-      # STEP 1: Clean up ALL orphaned AWS resources
-      # This handles the case when EC2 was deleted
-      # manually but Key Pair, SG, EIP remain
+      # STEP 1: Clean up orphaned AWS resources (except EIP)
+      # This handles the case when EC2 was deleted manually.
+      # EIP is intentionally preserved to keep a stable public IP.
       # ============================================
       - name: 🧹 Clean orphaned AWS resources (AWS CLI)
         run: |
@@ -57,17 +57,16 @@ jobs:
           aws ec2 delete-key-pair --key-name "$KEY_NAME" 2>/dev/null || true
           echo "✅ Key Pair cleaned"
 
-          echo "=== Releasing ALL tagged Elastic IPs ==="
-          EIP_ALLOCS=$(aws ec2 describe-addresses \
+          echo "=== Keeping Elastic IP untouched (persistent IP mode) ==="
+          EIP_INFO=$(aws ec2 describe-addresses \
             --filters "Name=tag:Name,Values=$EIP_TAG" \
-            --query 'Addresses[*].AllocationId' --output text) || true
-          if [ -n "$EIP_ALLOCS" ] && [ "$EIP_ALLOCS" != "None" ]; then
-            for ALLOC in $EIP_ALLOCS; do
-              echo "Releasing EIP: $ALLOC"
-              aws ec2 release-address --allocation-id "$ALLOC" 2>/dev/null || true
-            done
+            --query 'Addresses[*].[PublicIp,AllocationId,AssociationId,InstanceId]' --output text) || true
+          if [ -n "$EIP_INFO" ] && [ "$EIP_INFO" != "None" ]; then
+            echo "Persistent EIP found (will be reused by Terraform):"
+            echo "$EIP_INFO"
+          else
+            echo "⚠️ Tagged EIP not found; Terraform will create it on this run"
           fi
-          echo "✅ Elastic IPs cleaned"
 
           echo "=== Deleting Security Group ==="
           SG_ID=$(aws ec2 describe-security-groups \

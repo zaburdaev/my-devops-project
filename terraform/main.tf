@@ -179,6 +179,19 @@ resource "aws_instance" "health_dashboard" {
 resource "aws_eip" "app_eip" {
   domain = "vpc"
 
+  lifecycle {
+    # Critical: keep the same public IP across recovery runs.
+    prevent_destroy = true
+
+    # Association is managed by aws_eip_association resource below.
+    # Ignore association-level drift here to avoid accidental EIP recreation.
+    ignore_changes = [
+      instance,
+      network_interface,
+      associate_with_private_ip
+    ]
+  }
+
   tags = {
     Name    = "health-dashboard-eip"
     Project = "my-devops-project"

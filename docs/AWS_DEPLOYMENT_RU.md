@@ -422,11 +422,14 @@ cd terraform/
 terraform destroy -auto-approve
 ```
 
+> ⚠️ В режиме persistent EIP (с `prevent_destroy`) команда `terraform destroy` остановится на ресурсе Elastic IP. Это ожидаемо и защищает постоянный IP от случайного удаления.
+
 **Что происходит:**
 1. Удаляется EC2 Instance (виртуальный сервер)
 2. Удаляется Security Group
 3. Удаляется Key Pair
-4. Все данные на сервере будут ПОТЕРЯНЫ
+4. Elastic IP сохраняется (если включён `prevent_destroy`)
+5. Все данные на сервере будут ПОТЕРЯНЫ
 
 **⏱️ Время:** ~30-60 секунд
 
@@ -666,35 +669,54 @@ ssh -i key.pem user@ip "command"         # Выполнение команды
 
 ## 9. ♻️ Переразвёртывание после удаления EC2 (Recovery Runbook)
 
-Если сервер был удалён (ошибка в CI/CD: `dial tcp <old_ip>:22: i/o timeout`), выполните:
+### Цель: сохранить постоянный IP
+
+В проекте используется **persistent Elastic IP**. Текущий рабочий адрес:
+
+- **52.59.86.193**
+
+Это означает:
+- Recovery workflow удаляет только EC2/Key Pair/Security Group.
+- Elastic IP **не удаляется**.
+- Terraform повторно привязывает тот же EIP к новому инстансу.
+
+### Что изменено технически
+
+1. В `terraform/main.tf` для `aws_eip.app_eip` включён:
+   - `lifecycle.prevent_destroy = true`
+   - `lifecycle.ignore_changes` для association-related полей
+2. В `.github/workflows/infrastructure-recovery.yml` удалён шаг release EIP.
+3. `aws_eip_association` заново связывает сохранённый EIP с новым EC2.
+
+### Recovery шаги (без смены IP)
 
 ```bash
 cd /home/ubuntu/my-devops-project/terraform
 
-# 1) Очистка старого состояния
-terraform state list
-terraform destroy -auto-approve || true
-
-# 2) Повторный деплой инфраструктуры
 terraform init
 terraform plan
 terraform apply -auto-approve
 
-# 3) Сохранение ключа и IP
+# сохранить приватный ключ (если нужно для SSH)
 terraform output -raw ssh_private_key > my-devops-key.pem
 chmod 600 my-devops-key.pem
-terraform output -raw instance_public_ip
+
+# проверить, что IP остался прежним
+terraform output -raw elastic_ip
 ```
 
-Далее обновите GitHub Secrets:
-- `SERVER_HOST` = новый IP
-- `SERVER_USER` = `ec2-user`
-- `SSH_PRIVATE_KEY` = содержимое `my-devops-key.pem`
+Ожидаемый результат: `terraform output -raw elastic_ip` возвращает **52.59.86.193**.
 
-После этого:
-1. Запустите `ansible-playbook -i inventory.ini playbook.yml` для первичного развёртывания.
-2. Выполните push в `main`, чтобы проверить автоматический деплой через GitHub Actions.
-3. Проверьте доступность:
-   - `http://<IP>/health`
-   - `http://<IP>:3000`
-   - `http://<IP>:9090`
+### GitHub Secrets при persistent EIP
+
+- `SERVER_HOST` обычно **не меняется** (остаётся 52.59.86.193)
+- `SERVER_USER` = `ec2-user`
+- `SSH_PRIVATE_KEY` обновляйте только если ключ был пересоздан
+
+### Проверка после recovery
+
+1. `http://52.59.86.193/health`
+2. `http://52.59.86.193:3000`
+3. `http://52.59.86.193:9090`
+
+> ⚠️ Если нужно полностью удалить инфраструктуру вместе с EIP, сначала временно уберите `prevent_destroy` у `aws_eip.app_eip`, выполните `terraform apply`, и только потом `terraform destroy`.
