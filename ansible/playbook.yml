@@ -36,11 +36,10 @@
     # --- Grafana configuration (non-critical) ---
     - name: Configure Grafana datasource and dashboards
       shell: |
-        set -a
-        source {{ app_dir }}/.env
-        set +a
-        GRAFANA_USER="${GF_SECURITY_ADMIN_USER:-admin}" \
-        GRAFANA_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD:-admin}" \
+        GRAFANA_ENV_FILE="{{ app_dir }}/.env" \
+        GRAFANA_URL="http://localhost:3000" \
+        GRAFANA_WAIT_ATTEMPTS=120 \
+        GRAFANA_IMPORT_RETRIES=10 \
         bash {{ app_dir }}/scripts/configure_grafana.sh
       args:
         chdir: "{{ app_dir }}"
